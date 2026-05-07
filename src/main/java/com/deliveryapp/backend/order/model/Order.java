@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "transactions")
+@Table(name = "orders")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -49,7 +49,12 @@ public class Order {
     @JoinColumn(name = "location")
     private Location location;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany
+    @JoinTable(
+            name = "order_product",
+            joinColumns = @JoinColumn(name = "order_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
     private List<Product> products = new ArrayList<>();
 
     @Column(name = "total", nullable = false, precision = 6, scale = 2)
