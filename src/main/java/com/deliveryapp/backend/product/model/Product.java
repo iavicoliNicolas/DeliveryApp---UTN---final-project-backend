@@ -11,7 +11,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "accounts")
+@Table(name = "products")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -39,4 +39,6 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")
     private Store store;
+
+
 }
