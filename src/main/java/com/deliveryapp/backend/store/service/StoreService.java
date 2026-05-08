@@ -31,9 +31,9 @@ public class StoreService implements IStoreService{
     @Override
     public StoreResponseDTO save(StoreRequestDTO storeRequestDTO) {
 
-        User existingOwner =  userRepository.findById(storeRequestDTO.getOwner().getId())
+        User existingOwner =  userRepository.findById(storeRequestDTO.getOwnerId())
                 .orElseThrow(
-                        () -> new RuntimeException("Owner not found")
+                        () -> new UserNotFoundException(storeRequestDTO.getOwnerId())
                 );
 
         if (!existingOwner.getRole().equals(ERole.MERCHANT)) {
@@ -58,9 +58,9 @@ public class StoreService implements IStoreService{
                         () -> new StoreNotFoundException(id)
                 );
 
-        User existingOwner = userRepository.findById(storeRequestDTO.getOwner().getId())
+        User existingOwner = userRepository.findById(storeRequestDTO.getOwnerId())
                 .orElseThrow(
-                        () -> new UserNotFoundException(storeRequestDTO.getOwner().getId())
+                        () -> new UserNotFoundException(storeRequestDTO.getOwnerId())
                 );
 
         if (!existingOwner.getRole().equals(ERole.MERCHANT)) {
@@ -70,7 +70,6 @@ public class StoreService implements IStoreService{
         existingStore.setName(storeRequestDTO.getName());
         existingStore.setAddress(storeRequestDTO.getAddress());
         existingStore.setOwner(existingOwner);
-        existingStore.setProducts(storeRequestDTO.getProducts());
 
         Store storeSaved = storeRepository.save(existingStore);
 

@@ -11,7 +11,7 @@ public class StoreMapper {
         dto.setId(store.getId());
         dto.setName(store.getName());
         dto.setAddress(store.getAddress());
-        dto.setOwner(store.getOwner());
+        dto.setOwnerId(store.getOwner().getId());
 
         return dto;
     }

@@ -20,8 +20,7 @@ public class StoreRequestDTO {
     @Size(max = 40, message = "La dirección no puede superar los 40 caracteres")
     private String address;
 
-    @NotNull(message = "El id del dueño no puede ser nulo")
-    private User owner;
+    @NotNull(message = "El dueño no puede ser nulo")
+    private Long ownerId;
 
-    private Set<Product> products;
 }
