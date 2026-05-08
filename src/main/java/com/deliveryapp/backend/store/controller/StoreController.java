@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/stores")
+@RequestMapping("/api/v1/stores")
 @RequiredArgsConstructor
 public class StoreController {
     private final IStoreService storeService;
