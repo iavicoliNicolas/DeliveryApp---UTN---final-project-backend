@@ -6,6 +6,7 @@ import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.mapper.ProductMapper;
 import com.deliveryapp.backend.product.model.Product;
 import com.deliveryapp.backend.product.repository.ProductRepository;
+import com.deliveryapp.backend.store.exception.StoreNotFoundException;
 import com.deliveryapp.backend.store.model.Store;
 import com.deliveryapp.backend.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +58,7 @@ public class ProductService implements IProductService {
 
         Store existingStore =  storeRepository.findById(productRequestDTO.getStoreId())
                 .orElseThrow(
-                        () -> new RuntimeException("Store not found")
+                        () -> new StoreNotFoundException(productRequestDTO.getStoreId())
                 );
 
         // falta verificar que el usuario tipo comerciante sea dueño del store

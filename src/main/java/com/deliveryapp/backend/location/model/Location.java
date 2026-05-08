@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
-@Table(name = "transactions")
+@Table(name = "locations")
 @Getter
 @Setter
 @NoArgsConstructor

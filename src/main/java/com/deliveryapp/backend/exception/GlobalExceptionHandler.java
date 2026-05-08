@@ -2,6 +2,8 @@ package com.deliveryapp.backend.exception;
 
 import com.deliveryapp.backend.product.exception.ProductException;
 import com.deliveryapp.backend.product.exception.ProductNotFoundException;
+import com.deliveryapp.backend.store.exception.StoreNotFoundException;
+import com.deliveryapp.backend.user.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -24,8 +26,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<String> handleElementNotFoundException(ProductException ex){
+    @ExceptionHandler({ProductNotFoundException.class, StoreNotFoundException.class, UserNotFoundException.class})
+    public ResponseEntity<String> handleElementNotFoundException(Exception ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }
