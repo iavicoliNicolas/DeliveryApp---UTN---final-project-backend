@@ -2,6 +2,7 @@ package com.deliveryapp.backend.product.service;
 
 import com.deliveryapp.backend.product.dto.ProductRequestDTO;
 import com.deliveryapp.backend.product.dto.ProductResponseDTO;
+import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.mapper.ProductMapper;
 import com.deliveryapp.backend.product.model.Product;
 import com.deliveryapp.backend.product.repository.ProductRepository;
@@ -50,7 +51,7 @@ public class ProductService implements IProductService {
     public ProductResponseDTO update(Long id, ProductRequestDTO productRequestDTO) {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(
-                        () -> new RuntimeException("Product not found")
+                        () -> new ProductNotFoundException(id)
                 );
 
 
@@ -75,6 +76,14 @@ public class ProductService implements IProductService {
 
     @Override
     public void deleteById(Long id) {
+
+        //reemplazar por metodo exists? hay que ponerlo en la interface?
+
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(
+                        () -> new ProductNotFoundException(id)
+                );
+
         productRepository.deleteById(id);
 
     }

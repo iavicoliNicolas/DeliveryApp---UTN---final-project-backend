@@ -2,6 +2,7 @@ package com.deliveryapp.backend.product.controller;
 
 import com.deliveryapp.backend.product.dto.ProductRequestDTO;
 import com.deliveryapp.backend.product.dto.ProductResponseDTO;
+import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.model.Product;
 import com.deliveryapp.backend.product.service.IProductService;
 import jakarta.validation.Valid;
@@ -29,7 +30,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> findProductById(@PathVariable Long id){
         ProductResponseDTO productResponseDTO = productService.findById(id).orElseThrow(
-                () -> new RuntimeException("Product not found with id " + id)
+                () -> new ProductNotFoundException(id)
         );
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(productResponseDTO);
     }
@@ -48,7 +49,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id){
         productService.deleteById(id);
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body("Product id " + id + "deleted");
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body("Product with id " + id + " deleted");
     }
 
 
