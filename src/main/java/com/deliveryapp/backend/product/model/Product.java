@@ -24,7 +24,7 @@ public class Product {
     @Column(name = "product_name", nullable = false, length = 25)
     private String name;
 
-    @Column(name = "price", nullable = false, precision = 6, scale = 2)
+    @Column(name = "price", nullable = false, precision = 15, scale = 2)
     private BigDecimal price;
 
     @Column(name = "description", nullable = false, length = 50)
