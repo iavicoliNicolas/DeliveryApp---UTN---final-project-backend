@@ -20,7 +20,6 @@ import java.util.Optional;
 @Service
 public class StoreService implements IStoreService{
     private final StoreRepository storeRepository;
-    private final UserRepository userRepository;
 
     @Override
     public List<StoreResponseDTO> findAll() {
