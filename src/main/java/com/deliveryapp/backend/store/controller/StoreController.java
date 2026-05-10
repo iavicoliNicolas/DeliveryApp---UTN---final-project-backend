@@ -32,18 +32,18 @@ public class StoreController {
     }
 
     @PostMapping
-    public ResponseEntity<StoreResponseDTO> create(@Valid @RequestBody StoreRequestDTO storeRequestDTO){
+    public ResponseEntity<StoreResponseDTO> createStore(@Valid @RequestBody StoreRequestDTO storeRequestDTO){
         return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(storeService.save(storeRequestDTO));
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<StoreResponseDTO> update(@Valid @PathVariable Long id, @RequestBody StoreRequestDTO storeRequestDTO){
+    public ResponseEntity<StoreResponseDTO> updateStore(@Valid @PathVariable Long id, @RequestBody StoreRequestDTO storeRequestDTO){
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(storeService.update(id,storeRequestDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id){
+    public ResponseEntity<String> deleteStore(@PathVariable Long id){
         storeService.deleteById(id);
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body("Store with id " + id + " deleted");
     }
