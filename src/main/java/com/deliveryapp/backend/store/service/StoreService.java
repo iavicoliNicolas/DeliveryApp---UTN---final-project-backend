@@ -31,7 +31,7 @@ public class StoreService implements IStoreService{
     @Override
     public StoreResponseDTO save(StoreRequestDTO storeRequestDTO) {
 
-        User existingOwner =  userRepository.findById(storeRequestDTO.getOwnerId())
+      /*  User existingOwner =  userRepository.findById(storeRequestDTO.getOwnerId())
                 .orElseThrow(
                         () -> new UserNotFoundException(storeRequestDTO.getOwnerId())
                 );
@@ -39,8 +39,10 @@ public class StoreService implements IStoreService{
         if (!existingOwner.getRole().equals(ERole.MERCHANT)) {
             throw new RuntimeException("Invalid owner");
         }
-
-        Store storeSaved = storeRepository.save(StoreMapper.toEntity(storeRequestDTO, existingOwner));
+*/
+        User usuario = new User();
+        usuario.setId(1L);
+        Store storeSaved = storeRepository.save(StoreMapper.toEntity(storeRequestDTO, usuario));
 
         return StoreMapper.toResponse(storeSaved);
     }
@@ -57,7 +59,7 @@ public class StoreService implements IStoreService{
                 .orElseThrow(
                         () -> new StoreNotFoundException(id)
                 );
-
+/*
         User existingOwner = userRepository.findById(storeRequestDTO.getOwnerId())
                 .orElseThrow(
                         () -> new UserNotFoundException(storeRequestDTO.getOwnerId())
@@ -66,10 +68,12 @@ public class StoreService implements IStoreService{
         if (!existingOwner.getRole().equals(ERole.MERCHANT)) {
             throw new RuntimeException("Invalid owner");
         }
-
+*/
         existingStore.setName(storeRequestDTO.getName());
         existingStore.setAddress(storeRequestDTO.getAddress());
-        existingStore.setOwner(existingOwner);
+        User usuario = new User();
+        usuario.setId(1L);
+        existingStore.setOwner(usuario);
 
         Store storeSaved = storeRepository.save(existingStore);
 

@@ -2,7 +2,6 @@ package com.deliveryapp.backend.order.dto;
 
 import com.deliveryapp.backend.location.model.Location;
 import com.deliveryapp.backend.order.enums.EOrderStatus;
-import com.deliveryapp.backend.user.model.User;
 import lombok.Data;
 
 import java.math.BigDecimal;
