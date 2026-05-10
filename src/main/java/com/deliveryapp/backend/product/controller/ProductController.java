@@ -36,18 +36,18 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponseDTO> create(@Valid @RequestBody ProductRequestDTO productRequestDTO){
+    public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO productRequestDTO){
         return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(productService.save(productRequestDTO));
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> update(@Valid @PathVariable Long id, @RequestBody ProductRequestDTO productRequestDTO){
+    public ResponseEntity<ProductResponseDTO> updateProduct(@Valid @PathVariable Long id, @RequestBody ProductRequestDTO productRequestDTO){
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(productService.update(id,productRequestDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id){
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id){
         productService.deleteById(id);
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body("Product with id " + id + " deleted");
     }
