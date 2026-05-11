@@ -1,4 +1,4 @@
-package com.deliveryapp.backend.data;
+package com.deliveryapp.backend.common.data;
 
 import com.deliveryapp.backend.store.model.Store;
 import com.deliveryapp.backend.store.repository.StoreRepository;

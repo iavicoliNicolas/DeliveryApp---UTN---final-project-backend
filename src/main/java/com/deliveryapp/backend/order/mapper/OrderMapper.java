@@ -10,12 +10,19 @@ import com.deliveryapp.backend.user.model.User;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public class OrderMapper {
     public static OrderResponseDTO toResponse(Order order) {
         OrderResponseDTO dto = new OrderResponseDTO();
         dto.setId(order.getId());
-        dto.setRiderId(order.getRider().getId());
+        Optional<User> rider = Optional.ofNullable(order.getRider());
+        if (rider.isPresent()) {
+            dto.setRiderId(order.getRider().getId());
+        }else{
+            dto.setRiderId(null);
+        }
+
         dto.setStoreId(order.getStore().getId());
         dto.setConsumerId(order.getConsumer().getId());
         dto.setProducts(order.getProducts().stream().map(Product::getId).toList());

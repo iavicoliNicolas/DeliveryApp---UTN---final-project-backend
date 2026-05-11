@@ -1,6 +1,5 @@
-package com.deliveryapp.backend.exception;
+package com.deliveryapp.backend.common.exceptions;
 
-import com.deliveryapp.backend.product.exception.ProductException;
 import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.store.exception.StoreNotFoundException;
 import com.deliveryapp.backend.user.exception.UserNotFoundException;

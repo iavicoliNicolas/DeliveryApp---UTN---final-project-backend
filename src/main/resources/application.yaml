@@ -22,3 +22,9 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger
+
+app:
+  custom:
+   api:
+     version: 1.0.0
+
