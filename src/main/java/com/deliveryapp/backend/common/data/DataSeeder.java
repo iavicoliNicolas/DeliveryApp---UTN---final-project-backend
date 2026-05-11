@@ -32,6 +32,15 @@ public class DataSeeder implements CommandLineRunner {
             user.setRole(ERole.MERCHANT);
             userRepository.save(user);
 
+            User user2 = new User();
+            user2.setName("User Prueba2");
+            user2.setLastName("Prueba2");
+            user2.setEmail("emailprueba2");
+            user2.setPassword("12345");
+            user2.setRole(ERole.CONSUMER);
+            userRepository.save(user2);
+
+
             System.out.println("Datos de prueba cargados");
         }
 

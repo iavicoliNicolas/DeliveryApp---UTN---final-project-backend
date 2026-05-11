@@ -6,6 +6,7 @@ import com.deliveryapp.backend.order.exception.OrderNotFoundException;
 import com.deliveryapp.backend.order.mapper.OrderMapper;
 import com.deliveryapp.backend.order.model.Order;
 import com.deliveryapp.backend.order.repository.OrderRepository;
+import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.model.Product;
 import com.deliveryapp.backend.product.repository.ProductRepository;
 import com.deliveryapp.backend.store.model.Store;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,10 +40,19 @@ public class OrderService implements IOrderService {
     public OrderResponseDTO save(OrderRequestDTO dto) {
 
         User consumer = new User();
-        consumer.setId(1L);
+        consumer.setId(2L);
 
-        List<Product> products =
-                productRepository.findAllById(dto.getProducts());
+        List<Product> products = new ArrayList<>();
+
+        for(Long productId : dto.getProducts()){
+            Optional<Product> optionalProduct = productRepository.findById(productId);
+
+            if(!optionalProduct.isPresent()){
+                throw new ProductNotFoundException(productId);
+            }
+            optionalProduct.ifPresent(product -> products.add(product));
+        }
+
 
         Store store = products.getFirst().getStore();
 

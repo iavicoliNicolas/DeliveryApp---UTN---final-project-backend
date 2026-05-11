@@ -57,7 +57,7 @@ public class Order {
     )
     private List<Product> products = new ArrayList<>();
 
-    @Column(name = "total", nullable = false, precision = 6, scale = 2)
+    @Column(name = "total", nullable = false, precision = 9, scale = 2)
     private BigDecimal total;
 
     @Enumerated(EnumType.STRING)
