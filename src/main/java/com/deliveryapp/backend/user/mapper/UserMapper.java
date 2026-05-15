@@ -2,27 +2,48 @@ package com.deliveryapp.backend.user.mapper;
 
 import com.deliveryapp.backend.user.dto.UserRequestDTO;
 import com.deliveryapp.backend.user.dto.UserResponseDTO;
+import com.deliveryapp.backend.user.enums.ERole;
 import com.deliveryapp.backend.user.model.User;
+import lombok.Builder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
+
+@Component
 public class UserMapper {
 
-    public static UserResponseDTO toResponse(User user) {
-        UserResponseDTO dto = new UserResponseDTO();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setLastName(user.getLastName());
-        dto.setEmail(user.getEmail());
-        dto.setRole(user.getRole());
-        return dto;
+    public UserResponseDTO toResponse(User user) {
+        return UserResponseDTO.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .lastName(user.getLastName())
+                .role(user.getRole())
+                .build();
     }
 
-    public static User toEntity(UserRequestDTO dto) {
-        User user = new User();
-        user.setName(dto.getName());
-        user.setLastName(dto.getLastName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        user.setRole(dto.getRole());
-        return user;
+    public User toEntity(UserRequestDTO dto, PasswordEncoder passwordEncoder) {
+
+        ERole role = dto.getRole() != null ? dto.getRole() : ERole.CONSUMER;
+
+        return User.builder()
+
+                .name(dto.getName())
+                .lastName(dto.getLastName())
+                .email(dto.getEmail())
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .role(role)
+                .build();
+    }
+
+    public UserRequestDTO toRequest(User user){
+
+        return UserRequestDTO.builder()
+                .name(user.getName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .role(user.getRole())
+                .build();
     }
 }

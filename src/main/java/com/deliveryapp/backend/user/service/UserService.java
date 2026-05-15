@@ -8,6 +8,7 @@ import com.deliveryapp.backend.user.mapper.UserMapper;
 import com.deliveryapp.backend.user.model.User;
 import com.deliveryapp.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,12 +18,14 @@ import java.util.Optional;
 @Service
 public class UserService implements IUserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserResponseDTO> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(UserMapper::toResponse)
+                .map(userMapper::toResponse)
                 .toList();
     }
 
@@ -30,19 +33,19 @@ public class UserService implements IUserService {
     public List<UserResponseDTO> findAllByRole(ERole role) {
         return userRepository.findAllByRole(role)
                 .stream()
-                .map(UserMapper::toResponse)
+                .map(userMapper::toResponse)
                 .toList();
     }
 
     @Override
     public Optional<UserResponseDTO> findById(Long id) {
-        return userRepository.findById(id).map(UserMapper::toResponse);
+        return userRepository.findById(id).map(userMapper::toResponse);
     }
 
     @Override
     public UserResponseDTO save(UserRequestDTO dto) {
-        User savedUser = userRepository.save(UserMapper.toEntity(dto));
-        return UserMapper.toResponse(savedUser);
+        User savedUser = userRepository.save(userMapper.toEntity(dto, passwordEncoder));
+        return userMapper.toResponse(savedUser);
     }
 
     @Override
@@ -57,7 +60,7 @@ public class UserService implements IUserService {
         existingUser.setRole(dto.getRole());
 
         User updatedUser = userRepository.save(existingUser);
-        return UserMapper.toResponse(updatedUser);
+        return userMapper.toResponse(updatedUser);
     }
 
     @Override
@@ -70,5 +73,10 @@ public class UserService implements IUserService {
     @Override
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }
