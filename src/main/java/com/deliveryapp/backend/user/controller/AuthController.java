@@ -37,15 +37,15 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> loginUser(
-            @Valid @RequestBody UserRequestDTO userRequestDTO) {
-
-        if(userService.existsByEmail(userRequestDTO.getEmail())){
-
-        }
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(userRequestDTO));
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<UserResponseDTO> loginUser(
+//            @Valid @RequestBody UserRequestDTO userRequestDTO) {
+//
+//        if(!userService.existsByEmail(userRequestDTO.getEmail())){
+//            throw new RuntimeException("Email incorrecto");
+//        }
+//
+//        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(userRequestDTO));
+//    }
 
 }
