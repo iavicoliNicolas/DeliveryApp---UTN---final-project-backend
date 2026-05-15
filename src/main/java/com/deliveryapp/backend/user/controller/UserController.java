@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final IUserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> findAllUsers(
@@ -38,6 +40,9 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(
             @Valid @RequestBody UserRequestDTO userRequestDTO) {
+
+        userRequestDTO.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
+
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(userRequestDTO));
     }
 
@@ -45,6 +50,9 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> updateUser(
             @Valid @PathVariable Long id,
             @RequestBody UserRequestDTO userRequestDTO) {
+
+        userRequestDTO.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
+
         return ResponseEntity.ok(userService.update(id, userRequestDTO));
     }
 

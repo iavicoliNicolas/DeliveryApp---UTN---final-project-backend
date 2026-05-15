@@ -31,7 +31,9 @@ public class AuthController {
             throw new RuntimeException("El email ya está utilizado");
         }
 
-        var user = userMapper.toEntity(userRequestDTO, passwordEncoder);
+        userRequestDTO.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
+
+        var user = userMapper.toEntity(userRequestDTO);
         var savedUser = userService.save(userMapper.toRequest(user));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);

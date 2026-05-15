@@ -22,7 +22,7 @@ public class UserMapper {
                 .build();
     }
 
-    public User toEntity(UserRequestDTO dto, PasswordEncoder passwordEncoder) {
+    public User toEntity(UserRequestDTO dto) {
 
         ERole role = dto.getRole() != null ? dto.getRole() : ERole.CONSUMER;
 
@@ -31,7 +31,7 @@ public class UserMapper {
                 .name(dto.getName())
                 .lastName(dto.getLastName())
                 .email(dto.getEmail())
-                .password(passwordEncoder.encode(dto.getPassword()))
+                .password(dto.getPassword())
                 .role(role)
                 .build();
     }

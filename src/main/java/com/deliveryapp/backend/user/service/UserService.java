@@ -19,7 +19,6 @@ import java.util.Optional;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserResponseDTO> findAll() {
@@ -44,7 +43,7 @@ public class UserService implements IUserService {
 
     @Override
     public UserResponseDTO save(UserRequestDTO dto) {
-        User savedUser = userRepository.save(userMapper.toEntity(dto, passwordEncoder));
+        User savedUser = userRepository.save(userMapper.toEntity(dto));
         return userMapper.toResponse(savedUser);
     }
 

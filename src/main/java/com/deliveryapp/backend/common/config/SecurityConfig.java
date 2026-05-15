@@ -21,14 +21,15 @@ public class SecurityConfig {
     private final CustomUserDetailService userDetailService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http){
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
        return http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests((authorize -> authorize
-                        .requestMatchers("/api/v1/**").permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/auth/register").permitAll()
+                        .requestMatchers("/v3/api-docs/ ").permitAll()
                         .anyRequest().authenticated()
 
-                ))
+                )
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
