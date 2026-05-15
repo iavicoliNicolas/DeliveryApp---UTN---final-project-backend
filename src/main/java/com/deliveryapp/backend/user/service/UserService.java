@@ -66,4 +66,9 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new UserNotFoundException(id));
         userRepository.deleteById(id);
     }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 }
