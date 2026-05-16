@@ -15,6 +15,6 @@ public interface IUserService {
     UserResponseDTO save(UserRequestDTO userRequestDTO);
     UserResponseDTO update(Long id, UserRequestDTO userRequestDTO);
     void deleteById(Long id);
-    Optional<User> findByEmail(String email);
-    boolean existsByEmail(String email);
+    Optional<User> findUserByEmail(String email);
+    boolean existsUserByEmail(String email);
 }

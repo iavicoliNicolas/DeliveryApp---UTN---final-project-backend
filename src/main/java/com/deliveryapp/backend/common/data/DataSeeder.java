@@ -52,6 +52,16 @@ public class DataSeeder implements CommandLineRunner {
 
             userRepository.save(
                     User.builder()
+                            .name("Monica")
+                            .lastName("Azul")
+                            .email("monicaazul@mail.com")
+                            .password(passwordEncoder.encode("passDeMonica"))
+                            .role(ERole.ROLE_MERCHANT)
+                            .build()
+            );
+
+            userRepository.save(
+                    User.builder()
                             .name("Ana")
                             .lastName("Sunwalker")
                             .email("ana@mail.com")
@@ -73,9 +83,9 @@ public class DataSeeder implements CommandLineRunner {
 
             storeRepository.save(
                     Store.builder()
-                            .name("Pizza Hut")
+                            .name("Pizza Hut de Pedro")
                             .address("Calle 13")
-                            .owner(userRepository.findById(2L).get())
+                            .owner(userRepository.findByEmail("pedronight@mail.com").get())
                             .build()
             );
 
@@ -100,6 +110,37 @@ public class DataSeeder implements CommandLineRunner {
                             .store(storeRepository.findById(1L).get())
                             .build()
             );
+
+            storeRepository.save(
+                    Store.builder()
+                            .name("Lomitos Hut de Monica")
+                            .address("Calle 20")
+                            .owner(userRepository.findByEmail("monicaazul@mail.com").get())
+                            .build()
+            );
+
+            productRepository.save(
+                    Product.builder()
+                            .name("Lomo completo")
+                            .price(BigDecimal.valueOf(12.5))
+                            .description("Lomo complete con todo")
+                            .imageURL("/lomoCompleto")
+                            .status(EProductStatus.AVAILABLE)
+                            .store(storeRepository.findById(2L).get())
+                            .build()
+            );
+
+            productRepository.save(
+                    Product.builder()
+                            .name("Lomo basico")
+                            .price(BigDecimal.valueOf(5.5))
+                            .description("Lomo solo")
+                            .imageURL("/lomo basico")
+                            .status(EProductStatus.AVAILABLE)
+                            .store(storeRepository.findById(2L).get())
+                            .build()
+            );
+
 
             System.out.println("Datos de prueba cargados");
         }

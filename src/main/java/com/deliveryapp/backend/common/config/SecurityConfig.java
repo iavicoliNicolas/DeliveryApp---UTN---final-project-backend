@@ -25,23 +25,33 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
        return http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/v1/auth/register",
-                                "/v3/api-docs/"
-                                ).permitAll()
+                .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/api/v1/auth/register").permitAll()
+                        .requestMatchers("/v3/api-docs").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET,"/api/v1/products").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.POST,"/api/v1/products").hasRole( "MERCHANT")
+                        .requestMatchers(HttpMethod.PUT,"/api/v1/products/**").hasRole("MERCHANT")
+                        .requestMatchers(HttpMethod.DELETE,"/api/v1/products/**").hasRole("MERCHANT")
+
+
                         .requestMatchers(HttpMethod.GET,"/api/v1/orders").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
-                        .requestMatchers(HttpMethod.POST,"/api/v1/orders").hasAnyRole("ADMINISTRATOR", "CONSUMER")
+                        .requestMatchers(HttpMethod.POST,"/api/v1/orders").hasRole( "CONSUMER")
                         .requestMatchers(HttpMethod.PUT,"/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
-                        .requestMatchers(HttpMethod.DELETE,"/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "CONSUMER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/v1/orders/**").hasAnyRole("ADMINISTRATOR")
 
                         .anyRequest().authenticated()
 
                 )
+                 .headers(headers -> headers
+                      .frameOptions(frame -> frame.sameOrigin()) // Allow frames from same origin para que funcione h2-console
+                 )
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .build();
+
+                .build();
     }
 
     @Bean

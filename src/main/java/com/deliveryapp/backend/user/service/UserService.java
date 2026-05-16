@@ -70,12 +70,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
+    public Optional<User> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
     @Override
-    public boolean existsByEmail(String email) {
+    public boolean existsUserByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 }
