@@ -4,6 +4,7 @@ import com.deliveryapp.backend.user.service.CustomUserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -25,8 +26,15 @@ public class SecurityConfig {
        return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/register").permitAll()
-                        .requestMatchers("/v3/api-docs/ ").permitAll()
+                        .requestMatchers(
+                                "/api/v1/auth/register",
+                                "/v3/api-docs/"
+                                ).permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/orders").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.POST,"/api/v1/orders").hasAnyRole("ADMINISTRATOR", "CONSUMER")
+                        .requestMatchers(HttpMethod.PUT,"/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "CONSUMER")
+
                         .anyRequest().authenticated()
 
                 )

@@ -24,7 +24,7 @@ public class UserMapper {
 
     public User toEntity(UserRequestDTO dto) {
 
-        ERole role = dto.getRole() != null ? dto.getRole() : ERole.CONSUMER;
+        ERole role = dto.getRole() != null ? dto.getRole() : ERole.ROLE_CONSUMER;
 
         return User.builder()
 
