@@ -3,10 +3,7 @@ package com.deliveryapp.backend.store.model;
 import com.deliveryapp.backend.product.model.Product;
 import com.deliveryapp.backend.user.model.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,6 +14,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Store {
 
     @Id

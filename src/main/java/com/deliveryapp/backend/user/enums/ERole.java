@@ -2,8 +2,8 @@ package com.deliveryapp.backend.user.enums;
 
 public enum ERole {
 
-    ADMINISTRATOR,
-    MERCHANT,
-    RIDER,
-    CONSUMER
+    ROLE_ADMINISTRATOR,
+    ROLE_MERCHANT,
+    ROLE_RIDER,
+    ROLE_CONSUMER
 }
