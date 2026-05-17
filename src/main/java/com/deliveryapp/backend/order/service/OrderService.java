@@ -6,6 +6,8 @@ import com.deliveryapp.backend.order.exception.OrderNotFoundException;
 import com.deliveryapp.backend.order.mapper.OrderMapper;
 import com.deliveryapp.backend.order.model.Order;
 import com.deliveryapp.backend.order.repository.OrderRepository;
+import com.deliveryapp.backend.product.enums.EProductStatus;
+import com.deliveryapp.backend.product.exception.ProductException;
 import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.model.Product;
 import com.deliveryapp.backend.product.repository.ProductRepository;
@@ -50,9 +52,16 @@ public class OrderService implements IOrderService {
             if(!optionalProduct.isPresent()){
                 throw new ProductNotFoundException(productId);
             }
+
+            if(optionalProduct.get().getStatus().equals(EProductStatus.UNAVAILABLE)){
+                throw new ProductException("El producto " + optionalProduct.get().getName() + " no está disponible");
+            }
             optionalProduct.ifPresent(product -> products.add(product));
         }
 
+        if(dto.getProducts() == null || dto.getProducts().isEmpty()){
+            throw new RuntimeException("Debe haber al menos un producto en el pedido");
+        }
 
         Store store = products.getFirst().getStore();
 
