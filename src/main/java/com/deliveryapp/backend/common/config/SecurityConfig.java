@@ -34,19 +34,24 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
 
                         .requestMatchers(HttpMethod.GET,"/api/v1/products").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.GET,"/api/v1/products/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
                         .requestMatchers(HttpMethod.POST,"/api/v1/products").hasRole( "MERCHANT")
                         .requestMatchers(HttpMethod.PUT,"/api/v1/products/**").hasRole("MERCHANT")
                         .requestMatchers(HttpMethod.DELETE,"/api/v1/products/**").hasRole("MERCHANT")
 
                         .requestMatchers(HttpMethod.GET,"/api/v1/stores").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.GET,"/api/v1/stores/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
                         .requestMatchers(HttpMethod.POST,"/api/v1/stores").hasRole( "MERCHANT")
                         .requestMatchers(HttpMethod.PUT,"/api/v1/stores/**").hasRole("MERCHANT")
                         .requestMatchers(HttpMethod.DELETE,"/api/v1/stores/**").hasRole("MERCHANT")
 
                         .requestMatchers(HttpMethod.GET,"/api/v1/orders").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/orders/**").hasAnyRole("RIDER", "MERCHANT")
+                        .requestMatchers(HttpMethod.GET,"/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
                         .requestMatchers(HttpMethod.POST,"/api/v1/orders").hasRole( "CONSUMER")
                         .requestMatchers(HttpMethod.PUT,"/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
                         .requestMatchers(HttpMethod.DELETE,"/api/v1/orders/**").hasAnyRole("ADMINISTRATOR")
+
 
                         .anyRequest().authenticated()
 
