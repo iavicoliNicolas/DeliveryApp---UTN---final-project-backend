@@ -48,7 +48,7 @@ public class ProductController {
 
 
 
-    ////Como Comerciante quiero realizar Baja de productos de mi comercio
+    //Como Comerciante quiero realizar Baja de productos de mi comercio
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id){
         productService.deleteById(id);

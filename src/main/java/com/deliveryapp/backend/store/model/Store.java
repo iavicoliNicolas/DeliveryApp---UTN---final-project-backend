@@ -5,6 +5,7 @@ import com.deliveryapp.backend.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +27,12 @@ public class Store {
 
     @Column(name = "store_address", nullable = false, length = 40)
     private String address;
+
+    @Column(name = "latitude", nullable = false, precision = 10, scale = 7)
+    private BigDecimal latitude;
+
+    @Column(name = "longitude", nullable = false, precision = 10, scale = 7)
+    private BigDecimal longitude;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Product> products = new HashSet<>();

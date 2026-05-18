@@ -7,21 +7,25 @@ import com.deliveryapp.backend.user.model.User;
 
 public class StoreMapper {
     public static StoreResponseDTO toResponse(Store store) {
-        StoreResponseDTO dto = new StoreResponseDTO();
-        dto.setId(store.getId());
-        dto.setName(store.getName());
-        dto.setAddress(store.getAddress());
-        dto.setOwnerId(store.getOwner().getId());
 
-        return dto;
+       return StoreResponseDTO.builder()
+               .id(store.getId())
+               .name(store.getName())
+               .address(store.getAddress())
+               .ownerId(store.getOwner().getId())
+               .latitude(store.getLatitude())
+               .longitude(store.getLongitude())
+               .build();
     }
 
     public static Store toEntity(StoreRequestDTO dto, User user) {
-        Store store = new Store();
-        store.setName(dto.getName());
-        store.setAddress(dto.getAddress());
-        store.setOwner(user);
 
-        return store;
+        return Store.builder()
+                .name(dto.getName())
+                .address(dto.getAddress())
+                .owner(user)
+                .latitude(dto.getLatitude())
+                .longitude(dto.getLongitude())
+                .build();
     }
 }

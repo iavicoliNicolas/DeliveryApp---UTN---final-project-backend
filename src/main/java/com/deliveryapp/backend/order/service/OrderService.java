@@ -1,7 +1,10 @@
 package com.deliveryapp.backend.order.service;
 
-import com.deliveryapp.backend.order.dto.OrderRequestDTO;
+import com.deliveryapp.backend.common.services.AuthFacadeService;
+import com.deliveryapp.backend.order.dto.CreateOrderRequestDTO;
 import com.deliveryapp.backend.order.dto.OrderResponseDTO;
+import com.deliveryapp.backend.order.dto.UpdateOrderRequestDTO;
+import com.deliveryapp.backend.order.enums.EOrderStatus;
 import com.deliveryapp.backend.order.exception.OrderNotFoundException;
 import com.deliveryapp.backend.order.mapper.OrderMapper;
 import com.deliveryapp.backend.order.model.Order;
@@ -12,7 +15,6 @@ import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.model.Product;
 import com.deliveryapp.backend.product.repository.ProductRepository;
 import com.deliveryapp.backend.store.model.Store;
-import com.deliveryapp.backend.user.model.User;
 import com.deliveryapp.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final AuthFacadeService authFacadeService;
 
     @Override
     public List<OrderResponseDTO> findAll() {
@@ -39,10 +42,7 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public OrderResponseDTO save(OrderRequestDTO dto) {
-
-        User consumer = new User();
-        consumer.setId(2L);
+    public OrderResponseDTO save(CreateOrderRequestDTO dto) {
 
         List<Product> products = new ArrayList<>();
 
@@ -71,10 +71,12 @@ public class OrderService implements IOrderService {
 
         Order order = OrderMapper.toEntity(
                 dto,
-                consumer,
+                authFacadeService.getCurrentUser(),
                 store,
                 total,
-                products
+                products,
+                EOrderStatus.PENDING,
+                null
         );
 
         Order newOrder = orderRepository.save(order);
@@ -89,7 +91,7 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public OrderResponseDTO update(Long id, OrderRequestDTO dto) {
+    public OrderResponseDTO update(Long id, CreateOrderRequestDTO dto) {
 
         Order order = orderRepository.findById(id)
                 .orElseThrow(() ->
@@ -115,11 +117,34 @@ public class OrderService implements IOrderService {
 
         order.setStore(store);
 
-        order.setStoreAddress(store.getAddress());
-
         order.setOrderAddress(dto.getOrderAddress());
 
+        order.setLatitude(dto.getLatitude());
+
+        order.setLongitude(dto.getLongitude());
+
         order.setTotal(total);
+
+        order.setPaymentType(dto.getPaymentType());
+
+        Order updatedOrder = orderRepository.save(order);
+
+        return OrderMapper.toResponse(updatedOrder);
+    }
+
+    @Override
+    public OrderResponseDTO updateStatus(Long id, UpdateOrderRequestDTO updateOrderRequestDTO) {
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() ->
+                        new OrderNotFoundException(id)
+                );
+
+        order.setLatitude(updateOrderRequestDTO.getLatitude());
+
+        order.setLongitude(updateOrderRequestDTO.getLongitude());
+
+        order.setStatus(updateOrderRequestDTO.getStatus());
 
         Order updatedOrder = orderRepository.save(order);
 

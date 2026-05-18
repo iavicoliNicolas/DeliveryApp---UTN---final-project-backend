@@ -1,7 +1,8 @@
 package com.deliveryapp.backend.order.controller;
 
-import com.deliveryapp.backend.order.dto.OrderRequestDTO;
+import com.deliveryapp.backend.order.dto.CreateOrderRequestDTO;
 import com.deliveryapp.backend.order.dto.OrderResponseDTO;
+import com.deliveryapp.backend.order.dto.UpdateOrderRequestDTO;
 import com.deliveryapp.backend.order.exception.OrderNotFoundException;
 import com.deliveryapp.backend.order.service.IOrderService;
 import jakarta.validation.Valid;
@@ -33,14 +34,19 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponseDTO> createOrder(@Valid @RequestBody OrderRequestDTO orderRequestDTO){
+    public ResponseEntity<OrderResponseDTO> createOrder(@Valid @RequestBody CreateOrderRequestDTO orderRequestDTO){
         return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(orderService.save(orderRequestDTO));
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrderResponseDTO> updateOrder(@Valid @PathVariable Long id, @RequestBody OrderRequestDTO orderRequestDTO){
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderService.update(id,orderRequestDTO));
+    public ResponseEntity<OrderResponseDTO> updateOrder(@Valid @PathVariable Long id, @RequestBody CreateOrderRequestDTO createOorderRequestDTO){
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderService.update(id,createOorderRequestDTO));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<OrderResponseDTO> updateOrderStatus(@Valid @PathVariable Long id, @RequestBody UpdateOrderRequestDTO updateOrderRequestDTO){
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderService.updateStatus(id,updateOrderRequestDTO));
     }
 
     @DeleteMapping("/{id}")

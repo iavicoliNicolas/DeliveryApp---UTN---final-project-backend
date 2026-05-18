@@ -1,5 +1,6 @@
 package com.deliveryapp.backend.store.service;
 
+import com.deliveryapp.backend.common.services.AuthFacadeService;
 import com.deliveryapp.backend.store.dto.StoreRequestDTO;
 import com.deliveryapp.backend.store.dto.StoreResponseDTO;
 import com.deliveryapp.backend.store.exception.StoreNotFoundException;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @Service
 public class StoreService implements IStoreService{
     private final StoreRepository storeRepository;
+    private final AuthFacadeService authFacadeService;
 
     @Override
     public List<StoreResponseDTO> findAll() {
@@ -30,18 +32,7 @@ public class StoreService implements IStoreService{
     @Override
     public StoreResponseDTO save(StoreRequestDTO storeRequestDTO) {
 
-      /*  User existingOwner =  userRepository.findById(storeRequestDTO.getOwnerId())
-                .orElseThrow(
-                        () -> new UserNotFoundException(storeRequestDTO.getOwnerId())
-                );
-
-        if (!existingOwner.getRole().equals(ERole.MERCHANT)) {
-            throw new RuntimeException("Invalid owner");
-        }
-*/
-        User usuario = new User();
-        usuario.setId(1L);
-        Store storeSaved = storeRepository.save(StoreMapper.toEntity(storeRequestDTO, usuario));
+        Store storeSaved = storeRepository.save(StoreMapper.toEntity(storeRequestDTO, authFacadeService.getCurrentUser()));
 
         return StoreMapper.toResponse(storeSaved);
     }
@@ -58,21 +49,15 @@ public class StoreService implements IStoreService{
                 .orElseThrow(
                         () -> new StoreNotFoundException(id)
                 );
-/*
-        User existingOwner = userRepository.findById(storeRequestDTO.getOwnerId())
-                .orElseThrow(
-                        () -> new UserNotFoundException(storeRequestDTO.getOwnerId())
-                );
 
-        if (!existingOwner.getRole().equals(ERole.MERCHANT)) {
-            throw new RuntimeException("Invalid owner");
+        if(!existingStore.getOwner().equals(authFacadeService.getCurrentUser())){
+            throw new StoreNotFoundException(id);
         }
-*/
+
         existingStore.setName(storeRequestDTO.getName());
         existingStore.setAddress(storeRequestDTO.getAddress());
-        User usuario = new User();
-        usuario.setId(1L);
-        existingStore.setOwner(usuario);
+        existingStore.setLatitude(storeRequestDTO.getLatitude());
+        existingStore.setLongitude(storeRequestDTO.getLongitude());
 
         Store storeSaved = storeRepository.save(existingStore);
 
@@ -86,6 +71,10 @@ public class StoreService implements IStoreService{
                 .orElseThrow(
                         () -> new StoreNotFoundException(id)
                 );
+
+        if(!existingStore.getOwner().equals(authFacadeService.getCurrentUser())){
+            throw new StoreNotFoundException(id);
+        }
 
         storeRepository.deleteById(id);
     }

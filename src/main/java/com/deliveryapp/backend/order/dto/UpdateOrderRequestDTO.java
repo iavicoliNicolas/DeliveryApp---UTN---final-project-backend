@@ -2,6 +2,7 @@ package com.deliveryapp.backend.order.dto;
 
 import com.deliveryapp.backend.order.enums.EOrderStatus;
 import com.deliveryapp.backend.order.enums.EPaymentType;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,18 +15,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderResponseDTO {
+public class UpdateOrderRequestDTO {
 
-    private Long id;
-    private Long riderId;
-    private Long storeId;
-    private Long consumerId;
-    private List<Long> products;
-    private String storeAddress;
-    private String orderAddress;
-    private BigDecimal total;
-    private BigDecimal latitude;
-    private BigDecimal longitude;
+    @NotNull(message = "El estado del pedido no puede ser nulo")
     private EOrderStatus status;
-    private EPaymentType paymentType;
+
+    @NotNull(message = "La latitud del pedido no puede ser nula")
+    private BigDecimal latitude;
+
+    @NotNull(message = "La longitud de la entrega no puede ser nula")
+    private BigDecimal longitude;
+
 }
