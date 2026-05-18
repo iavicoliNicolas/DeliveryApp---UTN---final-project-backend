@@ -2,6 +2,7 @@ package com.deliveryapp.backend.order.model;
 
 import com.deliveryapp.backend.location.model.Location;
 import com.deliveryapp.backend.order.enums.EOrderStatus;
+import com.deliveryapp.backend.order.enums.EPaymentType;
 import com.deliveryapp.backend.product.model.Product;
 import com.deliveryapp.backend.store.model.Store;
 import com.deliveryapp.backend.user.model.User;
@@ -10,8 +11,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,12 +45,11 @@ public class Order {
     @Column(name = "order_address", nullable = false, length = 50)
     private String orderAddress;
 
-    @Column(name = "store_address", nullable = false, length = 50)
-    private String storeAddress;
+    @Column(name = "latitude", nullable = false, precision = 15, scale = 2)
+    private BigDecimal latitude;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "location")
-    private Location location;
+    @Column(name = "longitude", nullable = false, precision = 15, scale = 2)
+    private BigDecimal longitude;
 
     @ManyToMany
     @JoinTable(
@@ -62,4 +64,12 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private EOrderStatus status;
+
+    @LastModifiedDate
+    @Column(name = "last_update", nullable = false)
+    private LocalDateTime lastUpdate;
+
+    @Enumerated(EnumType.STRING)
+    private EPaymentType paymentType;
+
 }
