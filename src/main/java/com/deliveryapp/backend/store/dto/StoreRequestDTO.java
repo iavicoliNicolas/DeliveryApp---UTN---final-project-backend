@@ -27,10 +27,10 @@ public class StoreRequestDTO {
     @Size(max = 40, message = "La dirección no puede superar los 40 caracteres")
     private String address;
 
-    @NotBlank(message = "La latitud del comercio no puede estar vacía")
+    @NotNull(message = "La latitud del comercio no puede estar vacía")
     private BigDecimal latitude;
 
-    @NotBlank(message = "La longitud del comercio no puede estar vacía")
+    @NotNull(message = "La longitud del comercio no puede estar vacía")
     private BigDecimal longitude;
 
 }
