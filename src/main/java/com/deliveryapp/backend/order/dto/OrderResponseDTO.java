@@ -21,7 +21,6 @@ public class OrderResponseDTO {
     private Long storeId;
     private Long consumerId;
     private List<Long> products;
-    private String storeAddress;
     private String orderAddress;
     private BigDecimal total;
     private BigDecimal latitude;

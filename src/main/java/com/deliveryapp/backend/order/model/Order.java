@@ -7,6 +7,7 @@ import com.deliveryapp.backend.store.model.Store;
 import com.deliveryapp.backend.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
@@ -62,7 +63,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private EOrderStatus status;
 
-    @LastModifiedDate
+    @UpdateTimestamp
     @Column(name = "last_update", nullable = false)
     private LocalDateTime lastUpdate;
 

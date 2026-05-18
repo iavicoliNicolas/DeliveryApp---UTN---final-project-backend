@@ -22,6 +22,8 @@ public class OrderMapper {
                 .products(order.getProducts().stream().map(Product::getId).toList())
                 .orderAddress(order.getOrderAddress())
                 .total(order.getTotal())
+                .latitude(order.getLatitude())
+                .longitude(order.getLongitude())
                 .status(order.getStatus())
                 .paymentType(order.getPaymentType())
                 .build();
@@ -49,6 +51,7 @@ public class OrderMapper {
                 .store(store)
                 .latitude(orderRequestDTO.getLatitude())
                 .longitude(orderRequestDTO.getLongitude())
+                .paymentType(orderRequestDTO.getPaymentType())
                 .build();
     }
 }
