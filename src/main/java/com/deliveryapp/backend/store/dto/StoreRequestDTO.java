@@ -5,11 +5,18 @@ import com.deliveryapp.backend.user.model.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class StoreRequestDTO {
 
     @NotBlank(message = "El nombre del comercio no puede estar vacío")
@@ -19,5 +26,11 @@ public class StoreRequestDTO {
     @NotBlank(message = "La dirección del comercio no puede estar vacía")
     @Size(max = 40, message = "La dirección no puede superar los 40 caracteres")
     private String address;
+
+    @NotBlank(message = "La latitud del comercio no puede estar vacía")
+    private BigDecimal latitude;
+
+    @NotBlank(message = "La longitud del comercio no puede estar vacía")
+    private BigDecimal longitude;
 
 }

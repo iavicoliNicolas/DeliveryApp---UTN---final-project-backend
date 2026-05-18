@@ -1,6 +1,5 @@
 package com.deliveryapp.backend.order.model;
 
-import com.deliveryapp.backend.location.model.Location;
 import com.deliveryapp.backend.order.enums.EOrderStatus;
 import com.deliveryapp.backend.order.enums.EPaymentType;
 import com.deliveryapp.backend.product.model.Product;
@@ -45,10 +44,10 @@ public class Order {
     @Column(name = "order_address", nullable = false, length = 50)
     private String orderAddress;
 
-    @Column(name = "latitude", nullable = false, precision = 15, scale = 2)
+    @Column(name = "latitude", nullable = false, precision = 10, scale = 7)
     private BigDecimal latitude;
 
-    @Column(name = "longitude", nullable = false, precision = 15, scale = 2)
+    @Column(name = "longitude", nullable = false, precision = 10, scale = 7)
     private BigDecimal longitude;
 
     @ManyToMany

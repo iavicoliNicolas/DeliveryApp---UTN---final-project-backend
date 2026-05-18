@@ -38,6 +38,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT,"/api/v1/products/**").hasRole("MERCHANT")
                         .requestMatchers(HttpMethod.DELETE,"/api/v1/products/**").hasRole("MERCHANT")
 
+                        .requestMatchers(HttpMethod.GET,"/api/v1/stores").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.POST,"/api/v1/stores").hasRole( "MERCHANT")
+                        .requestMatchers(HttpMethod.PUT,"/api/v1/stores/**").hasRole("MERCHANT")
+                        .requestMatchers(HttpMethod.DELETE,"/api/v1/stores/**").hasRole("MERCHANT")
 
                         .requestMatchers(HttpMethod.GET,"/api/v1/orders").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
                         .requestMatchers(HttpMethod.POST,"/api/v1/orders").hasRole( "CONSUMER")

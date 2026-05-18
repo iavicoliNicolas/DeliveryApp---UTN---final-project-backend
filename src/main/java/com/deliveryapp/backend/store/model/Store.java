@@ -28,12 +28,11 @@ public class Store {
     @Column(name = "store_address", nullable = false, length = 40)
     private String address;
 
-    @Column(name = "latitude", nullable = false, precision = 15, scale = 2)
+    @Column(name = "latitude", nullable = false, precision = 10, scale = 7)
     private BigDecimal latitude;
 
-    @Column(name = "longitude", nullable = false, precision = 15, scale = 2)
+    @Column(name = "longitude", nullable = false, precision = 10, scale = 7)
     private BigDecimal longitude;
-
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Product> products = new HashSet<>();
