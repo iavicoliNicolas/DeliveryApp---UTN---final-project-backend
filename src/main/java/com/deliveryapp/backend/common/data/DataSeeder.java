@@ -9,11 +9,14 @@ import com.deliveryapp.backend.user.enums.ERole;
 import com.deliveryapp.backend.user.model.User;
 import com.deliveryapp.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import net.datafaker.Faker;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
@@ -25,6 +28,8 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
+        Faker faker = new Faker(new Locale("es"));
 
         userRepository.deleteAll();
         storeRepository.deleteAll();
@@ -90,6 +95,24 @@ public class DataSeeder implements CommandLineRunner {
                             .longitude(BigDecimal.valueOf(32.232398))
                             .build()
             );
+
+
+            //Collections.shuffle(Arrays.stream(EProductStatus.values()).toList());
+
+            List<Product> products = IntStream.rangeClosed(1,100)
+                            .mapToObj(i -> Product.builder()
+                                    .name(faker.food().dish())
+                                    .price(BigDecimal.valueOf(faker.number().numberBetween(1,100)))
+                                    .description(faker.text().text(20))
+                                    .imageURL(faker.internet().url())
+                                    .status(EProductStatus.AVAILABLE)
+                                    .store(storeRepository.findById(1L).get())
+                                    .build()
+                            ).toList();
+
+            productRepository.saveAll(products);
+
+
 
             productRepository.save(
                     Product.builder()

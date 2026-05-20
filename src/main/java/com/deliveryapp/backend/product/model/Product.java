@@ -19,13 +19,13 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "product_name", nullable = false, length = 25)
+    @Column(name = "product_name", nullable = false, length = 40)
     private String name;
 
     @Column(name = "price", nullable = false, precision = 15, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "description", nullable = false, length = 50)
+    @Column(name = "description", nullable = false, length = 100)
     private String description;
 
     @Column(name = "imageURL", length = 250)

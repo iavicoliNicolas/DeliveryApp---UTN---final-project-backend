@@ -1,5 +1,7 @@
 package com.deliveryapp.backend.product.service;
 
+import com.deliveryapp.backend.common.pagination.PaginationQuery;
+import com.deliveryapp.backend.common.pagination.PaginationResult;
 import com.deliveryapp.backend.common.services.AuthFacadeService;
 import com.deliveryapp.backend.product.dto.ProductRequestDTO;
 import com.deliveryapp.backend.product.dto.ProductResponseDTO;
@@ -12,6 +14,8 @@ import com.deliveryapp.backend.store.model.Store;
 import com.deliveryapp.backend.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -81,8 +85,6 @@ public class ProductService implements IProductService {
     }
 
 
-
-
     @Override
     public void deleteById(Long id) {
 
@@ -98,22 +100,37 @@ public class ProductService implements IProductService {
 
     }
 
+    @Override
+    public PaginationResult<ProductResponseDTO> findAll(PaginationQuery paginationQuery) {
+        PageRequest pageRequest = PageRequest.of(paginationQuery.getPage(), paginationQuery.getSize());
+
+        Page<Product> page = productRepository.findAll(pageRequest);
+
+        return new PaginationResult<>(
+                page.getContent().stream().map(ProductMapper::toResponse).toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements()
+        );
+
+        // return productRepository.findAll(pageable).map(ProductMapper::toResponse);
+    }
 
 
     private void isOwnerVerification(Store existingStore) {
-        if(!existingStore.getOwner().equals(authFacadeService.getCurrentUser())) {
+        if (!existingStore.getOwner().equals(authFacadeService.getCurrentUser())) {
             throw new StoreNotFoundException(existingStore.getId());
         }
     }
 
     private @NonNull Store getExistingStore(ProductRequestDTO productRequestDTO) {
-        Store existingStore =  storeRepository.findById(productRequestDTO.getStoreId())
+        Store existingStore = storeRepository.findById(productRequestDTO.getStoreId())
                 .orElseThrow(
                         () -> new StoreNotFoundException(productRequestDTO.getStoreId())
                 );
         return existingStore;
     }
-
 
 
 }
