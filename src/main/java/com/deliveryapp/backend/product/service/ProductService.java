@@ -51,7 +51,8 @@ public class ProductService implements IProductService {
                 ProductSpecification.byName(productFilter.getName())
                         .and(ProductSpecification.byDescription(productFilter.getDescription())
                                 .and(ProductSpecification.byStatus(productFilter.getStatus())
-                                        .and(ProductSpecification.byStoreId(productFilter.getStoreId()))))
+                                        .and(ProductSpecification.byStoreId(productFilter.getStoreId())
+                                                .and(ProductSpecification.byPrice(productFilter.getPriceMin(), productFilter.getPriceMax())))))
         );
 
         Page<Product> page = productRepository.findAll(specification, pageRequest);

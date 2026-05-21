@@ -4,6 +4,8 @@ import com.deliveryapp.backend.product.enums.EProductStatus;
 import com.deliveryapp.backend.product.model.Product;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.math.BigDecimal;
+
 public class ProductSpecification {
 
     public static Specification<Product> byName(String name) {
@@ -36,6 +38,22 @@ public class ProductSpecification {
         return (root, criteriaQuery, cb)
                 -> storeId == null ? null : cb.equal(root.get("store").get("id"), storeId);
     }
+
+    public static Specification<Product> byPrice(BigDecimal priceMin, BigDecimal priceMax) {
+        return (root, criteriaQuery, cb)
+                -> {
+            if (priceMin == null && priceMax == null) {
+                return null;
+            } else if (priceMin == null) {
+                return cb.lessThanOrEqualTo(root.get("price"), priceMax);
+            } else if (priceMax == null) {
+                return cb.greaterThanOrEqualTo(root.get("price"), priceMin);
+            }
+
+            return cb.between(root.get("price"), priceMin, priceMax);
+        };
+    }
+
 
 }
 
