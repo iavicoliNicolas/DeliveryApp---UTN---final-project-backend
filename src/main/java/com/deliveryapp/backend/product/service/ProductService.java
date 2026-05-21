@@ -52,7 +52,9 @@ public class ProductService implements IProductService {
                         .and(ProductSpecification.byDescription(productFilter.getDescription())
                                 .and(ProductSpecification.byStatus(productFilter.getStatus())
                                         .and(ProductSpecification.byStoreId(productFilter.getStoreId())
-                                                .and(ProductSpecification.byPrice(productFilter.getPriceMin(), productFilter.getPriceMax())))))
+                                                .and(ProductSpecification.byPrice(productFilter.getPriceMin(), productFilter.getPriceMax())
+                                                        .and(ProductSpecification.byDistanceLatitude(productFilter.getLatitude(), productFilter.getLongitude(), productFilter.getDistance())
+                                                                .and(ProductSpecification.byDistanceLongitude(productFilter.getLatitude(), productFilter.getLongitude(), productFilter.getDistance())))))))
         );
 
         Page<Product> page = productRepository.findAll(specification, pageRequest);

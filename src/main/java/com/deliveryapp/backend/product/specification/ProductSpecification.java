@@ -54,6 +54,33 @@ public class ProductSpecification {
         };
     }
 
+    public static Specification<Product> byDistanceLatitude(BigDecimal latitude, BigDecimal longitude, Integer distance) {
+        return (root, criteriaQuery, cb)
+                -> {
+            if (distance == null || latitude == null || longitude == null) {
+                return null;
+            }
+            BigDecimal latitudeA = latitude.add(BigDecimal.valueOf((double) distance / 111111));
+            BigDecimal latitudeB = latitude.subtract(BigDecimal.valueOf((double) distance / 111111));
+            return cb.between(root.get("store").get("latitude"),
+                    latitudeB, latitudeA);
+        };
+
+    }
+
+    public static Specification<Product> byDistanceLongitude(BigDecimal latitude, BigDecimal longitude, Integer distance) {
+        return (root, criteriaQuery, cb)
+                -> {
+            if (distance == null || latitude == null || longitude == null) {
+                return null;
+            }
+            BigDecimal longitudeA = longitude.add(BigDecimal.valueOf((double) distance / 111111));
+            BigDecimal longitudeB = longitude.subtract(BigDecimal.valueOf((double) distance / 111111));
+
+            return cb.between(root.get("store").get("longitude"),
+                    longitudeB, longitudeA);
+        };
+    }
 
 }
 

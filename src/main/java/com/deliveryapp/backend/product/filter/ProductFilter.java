@@ -14,5 +14,8 @@ public class ProductFilter {
     private BigDecimal priceMax;
     private String status;
     private Long storeId;
+    private BigDecimal latitude;
+    private BigDecimal longitude;
+    private Integer distance;
 
 }

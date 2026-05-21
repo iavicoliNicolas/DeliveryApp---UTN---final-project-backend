@@ -92,8 +92,8 @@ public class DataSeeder implements CommandLineRunner {
                             .name("Pizza Hut de Pedro")
                             .address("Calle 13")
                             .owner(userRepository.findByEmail("pedronight@mail.com").get())
-                            .latitude(BigDecimal.valueOf(23.923872))
-                            .longitude(BigDecimal.valueOf(32.232398))
+                            .latitude(BigDecimal.valueOf(-37.994044345914496))
+                            .longitude(BigDecimal.valueOf(-57.55520222953616))
                             .build()
             );
 
@@ -139,8 +139,8 @@ public class DataSeeder implements CommandLineRunner {
                             .name("Lomitos Hut de Monica")
                             .address("Calle 20")
                             .owner(userRepository.findByEmail("monicaazul@mail.com").get())
-                            .latitude(BigDecimal.valueOf(24.3532472))
-                            .longitude(BigDecimal.valueOf(30.324398))
+                            .latitude(BigDecimal.valueOf(-37.982457540007395))
+                            .longitude(BigDecimal.valueOf(-57.56733097751799))
                             .build()
             );
 

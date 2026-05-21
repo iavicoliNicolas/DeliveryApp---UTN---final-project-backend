@@ -22,10 +22,6 @@ import java.math.BigDecimal;
 public class ProductController {
     private final IProductService productService;
 
-//    @GetMapping
-//    public ResponseEntity<List<ProductResponseDTO>> findAllProducts(){
-//        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(productService.findAll());
-//    }
 
     @GetMapping
     public ResponseEntity<PaginationResult<ProductResponseDTO>> findAllProducts(
@@ -38,13 +34,13 @@ public class ProductController {
             @RequestParam(required = false) BigDecimal priceMin,
             @RequestParam(required = false) BigDecimal priceMax,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) Long storeId
+            @RequestParam(required = false) Long storeId,
+            @RequestParam(required = false) BigDecimal latitude,
+            @RequestParam(required = false) BigDecimal longitude,
+            @RequestParam(required = false) Integer distance
     ) {
-
         PaginationQuery paginationQuery = new PaginationQuery(pageNumber, pageSize, sortBy, direction);
-
-        ProductFilter productFilter = new ProductFilter(name, description, priceMin, priceMax, status, storeId);
-
+        ProductFilter productFilter = new ProductFilter(name, description, priceMin, priceMax, status, storeId, latitude, longitude, distance);
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(productService.findAll(paginationQuery, productFilter));
     }
