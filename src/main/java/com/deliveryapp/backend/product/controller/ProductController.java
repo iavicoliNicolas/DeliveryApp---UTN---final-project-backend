@@ -5,12 +5,15 @@ import com.deliveryapp.backend.common.pagination.PaginationResult;
 import com.deliveryapp.backend.product.dto.ProductRequestDTO;
 import com.deliveryapp.backend.product.dto.ProductResponseDTO;
 import com.deliveryapp.backend.product.exception.ProductNotFoundException;
+import com.deliveryapp.backend.product.filter.ProductFilter;
 import com.deliveryapp.backend.product.service.IProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 
 @RestController
@@ -27,14 +30,23 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<PaginationResult<ProductResponseDTO>> findAllProducts(
             @RequestParam(defaultValue = "5") int pageSize,
-            @RequestParam(defaultValue = "0") int pageNumber
+            @RequestParam(defaultValue = "0") int pageNumber,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) BigDecimal priceMin,
+            @RequestParam(required = false) BigDecimal priceMax,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long storeId
     ) {
 
-        PaginationQuery paginationQuery = new PaginationQuery(pageNumber, pageSize);
-        // PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+        PaginationQuery paginationQuery = new PaginationQuery(pageNumber, pageSize, sortBy, direction);
+
+        ProductFilter productFilter = new ProductFilter(name, description, priceMin, priceMax, status, storeId);
 
 
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(productService.findAll(paginationQuery));
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(productService.findAll(paginationQuery, productFilter));
     }
 
 

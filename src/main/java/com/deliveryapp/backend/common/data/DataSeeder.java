@@ -15,7 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
 import java.util.stream.IntStream;
 
 @Component
@@ -34,7 +35,7 @@ public class DataSeeder implements CommandLineRunner {
         userRepository.deleteAll();
         storeRepository.deleteAll();
 
-        if(userRepository.count() == 0){
+        if (userRepository.count() == 0) {
             userRepository.save(
                     User.builder()
                             .name("Juan")
@@ -97,21 +98,18 @@ public class DataSeeder implements CommandLineRunner {
             );
 
 
-            //Collections.shuffle(Arrays.stream(EProductStatus.values()).toList());
-
-            List<Product> products = IntStream.rangeClosed(1,100)
-                            .mapToObj(i -> Product.builder()
-                                    .name(faker.food().dish())
-                                    .price(BigDecimal.valueOf(faker.number().numberBetween(1,100)))
-                                    .description(faker.text().text(20))
-                                    .imageURL(faker.internet().url())
-                                    .status(EProductStatus.AVAILABLE)
-                                    .store(storeRepository.findById(1L).get())
-                                    .build()
-                            ).toList();
+            List<Product> products = IntStream.rangeClosed(1, 100)
+                    .mapToObj(i -> Product.builder()
+                            .name(faker.food().dish())
+                            .price(BigDecimal.valueOf(faker.number().numberBetween(1, 100)))
+                            .description(faker.lorem().maxLengthSentence(80))
+                            .imageURL(faker.internet().image())
+                            .status(EProductStatus.values()[faker.random().nextInt(EProductStatus.values().length)])
+                            .store(storeRepository.findById(1L).get())
+                            .build()
+                    ).toList();
 
             productRepository.saveAll(products);
-
 
 
             productRepository.save(
@@ -146,6 +144,20 @@ public class DataSeeder implements CommandLineRunner {
                             .build()
             );
 
+            products = IntStream.rangeClosed(1, 50)
+                    .mapToObj(i -> Product.builder()
+                            .name(faker.food().dish())
+                            .price(BigDecimal.valueOf(faker.number().numberBetween(1, 100)))
+                            .description(faker.lorem().maxLengthSentence(80))
+                            .imageURL(faker.internet().image())
+                            .status(EProductStatus.values()[faker.random().nextInt(EProductStatus.values().length)])
+                            .store(storeRepository.findById(2L).get())
+                            .build()
+                    ).toList();
+
+            productRepository.saveAll(products);
+
+
             productRepository.save(
                     Product.builder()
                             .name("Lomo completo")
@@ -171,7 +183,6 @@ public class DataSeeder implements CommandLineRunner {
 
             System.out.println("Datos de prueba cargados");
         }
-
 
 
     }
