@@ -9,11 +9,15 @@ import com.deliveryapp.backend.user.enums.ERole;
 import com.deliveryapp.backend.user.model.User;
 import com.deliveryapp.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import net.datafaker.Faker;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
@@ -26,10 +30,12 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
+        Faker faker = new Faker(new Locale("es"));
+
         userRepository.deleteAll();
         storeRepository.deleteAll();
 
-        if(userRepository.count() == 0){
+        if (userRepository.count() == 0) {
             userRepository.save(
                     User.builder()
                             .name("Juan")
@@ -86,10 +92,25 @@ public class DataSeeder implements CommandLineRunner {
                             .name("Pizza Hut de Pedro")
                             .address("Calle 13")
                             .owner(userRepository.findByEmail("pedronight@mail.com").get())
-                            .latitude(BigDecimal.valueOf(23.923872))
-                            .longitude(BigDecimal.valueOf(32.232398))
+                            .latitude(BigDecimal.valueOf(-37.994044345914496))
+                            .longitude(BigDecimal.valueOf(-57.55520222953616))
                             .build()
             );
+
+
+            List<Product> products = IntStream.rangeClosed(1, 100)
+                    .mapToObj(i -> Product.builder()
+                            .name(faker.food().dish())
+                            .price(BigDecimal.valueOf(faker.number().numberBetween(1, 100)))
+                            .description(faker.lorem().maxLengthSentence(80))
+                            .imageURL(faker.internet().image())
+                            .status(EProductStatus.values()[faker.random().nextInt(EProductStatus.values().length)])
+                            .store(storeRepository.findById(1L).get())
+                            .build()
+                    ).toList();
+
+            productRepository.saveAll(products);
+
 
             productRepository.save(
                     Product.builder()
@@ -118,10 +139,24 @@ public class DataSeeder implements CommandLineRunner {
                             .name("Lomitos Hut de Monica")
                             .address("Calle 20")
                             .owner(userRepository.findByEmail("monicaazul@mail.com").get())
-                            .latitude(BigDecimal.valueOf(24.3532472))
-                            .longitude(BigDecimal.valueOf(30.324398))
+                            .latitude(BigDecimal.valueOf(-37.982457540007395))
+                            .longitude(BigDecimal.valueOf(-57.56733097751799))
                             .build()
             );
+
+            products = IntStream.rangeClosed(1, 50)
+                    .mapToObj(i -> Product.builder()
+                            .name(faker.food().dish())
+                            .price(BigDecimal.valueOf(faker.number().numberBetween(1, 100)))
+                            .description(faker.lorem().maxLengthSentence(80))
+                            .imageURL(faker.internet().image())
+                            .status(EProductStatus.values()[faker.random().nextInt(EProductStatus.values().length)])
+                            .store(storeRepository.findById(2L).get())
+                            .build()
+                    ).toList();
+
+            productRepository.saveAll(products);
+
 
             productRepository.save(
                     Product.builder()
@@ -148,7 +183,6 @@ public class DataSeeder implements CommandLineRunner {
 
             System.out.println("Datos de prueba cargados");
         }
-
 
 
     }

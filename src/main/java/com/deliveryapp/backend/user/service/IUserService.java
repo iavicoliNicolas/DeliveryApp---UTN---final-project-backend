@@ -10,11 +10,18 @@ import java.util.Optional;
 
 public interface IUserService {
     List<UserResponseDTO> findAll();
+
     List<UserResponseDTO> findAllByRole(ERole role);
+
     Optional<UserResponseDTO> findById(Long id);
+
     UserResponseDTO save(UserRequestDTO userRequestDTO);
+
     UserResponseDTO update(Long id, UserRequestDTO userRequestDTO);
+
     void deleteById(Long id);
+
     Optional<User> findUserByEmail(String email);
+
     boolean existsUserByEmail(String email);
 }
