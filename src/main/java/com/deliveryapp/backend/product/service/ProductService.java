@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +40,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginationResult<ProductResponseDTO> findAll(PaginationQuery paginationQuery, ProductFilter productFilter) {
 
         PageRequest pageRequest = PageRequest.of(
@@ -69,6 +71,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ProductResponseDTO save(ProductRequestDTO productRequestDTO) {
         Store existingStore = getExistingStore(productRequestDTO);
         isOwnerVerification(existingStore);
@@ -83,6 +86,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ProductResponseDTO update(Long id, ProductRequestDTO productRequestDTO) {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(
@@ -111,6 +115,7 @@ public class ProductService implements IProductService {
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteById(Long id) {
 
         Product existingProduct = productRepository.findById(id)
