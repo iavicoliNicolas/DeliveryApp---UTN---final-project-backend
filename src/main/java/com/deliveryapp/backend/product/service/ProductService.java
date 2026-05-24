@@ -6,6 +6,7 @@ import com.deliveryapp.backend.common.services.AuthFacadeService;
 import com.deliveryapp.backend.product.dto.ProductRequestDTO;
 import com.deliveryapp.backend.product.dto.ProductResponseDTO;
 import com.deliveryapp.backend.product.exception.ProductNotFoundException;
+import com.deliveryapp.backend.product.exception.ProductSearchMissingLocationException;
 import com.deliveryapp.backend.product.filter.ProductFilter;
 import com.deliveryapp.backend.product.mapper.ProductMapper;
 import com.deliveryapp.backend.product.model.Product;
@@ -14,6 +15,7 @@ import com.deliveryapp.backend.product.specification.ProductSpecification;
 import com.deliveryapp.backend.store.exception.StoreNotFoundException;
 import com.deliveryapp.backend.store.model.Store;
 import com.deliveryapp.backend.store.repository.StoreRepository;
+import com.deliveryapp.backend.user.enums.ERole;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
@@ -48,6 +50,12 @@ public class ProductService implements IProductService {
                 paginationQuery.getSize(),
                 Sort.by(Sort.Direction.fromString(paginationQuery.getDirection()), paginationQuery.getSortBy())
         );
+
+        if (authFacadeService.isRole(ERole.ROLE_CONSUMER) &&
+                (productFilter.getLatitude() == null || productFilter.getLongitude() == null || productFilter.getDistance() == null)) {
+            throw new ProductSearchMissingLocationException("Falta parametro Latitude, Longitude y Distance");
+        }
+
 
         Specification<Product> specification = Specification.allOf(
                 ProductSpecification.byName(productFilter.getName())
