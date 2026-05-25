@@ -12,6 +12,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.deliveryapp.backend.order.exception.OrderNotFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            ProductNotFoundException.class, StoreNotFoundException.class, UserNotFoundException.class
+            ProductNotFoundException.class, StoreNotFoundException.class, UserNotFoundException.class, OrderNotFoundException.class
     })
     public ResponseEntity<ErrorMessage> handleElementNotFoundException(HttpServletRequest request, Exception ex) {
         return ResponseEntity

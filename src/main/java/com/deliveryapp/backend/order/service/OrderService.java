@@ -18,6 +18,9 @@ import com.deliveryapp.backend.store.model.Store;
 import com.deliveryapp.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.deliveryapp.backend.store.repository.StoreRepository;
+import com.deliveryapp.backend.store.exception.StoreNotFoundException;
+import com.deliveryapp.backend.store.repository.StoreRepository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -31,6 +34,7 @@ public class OrderService implements IOrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final AuthFacadeService authFacadeService;
+    private final StoreRepository storeRepository;
 
     @Override
     public List<OrderResponseDTO> findAll() {
@@ -160,5 +164,20 @@ public class OrderService implements IOrderService {
                 );
 
         orderRepository.deleteById(id);
+    }
+
+    @Override
+    public List<OrderResponseDTO> findByStoreId(Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new StoreNotFoundException(storeId));
+
+        if (!store.getOwner().equals(authFacadeService.getCurrentUser())) {
+            throw new StoreNotFoundException(storeId);
+        }
+
+        return orderRepository.findByStoreId(storeId)
+                .stream()
+                .map(OrderMapper::toResponse)
+                .toList();
     }
 }
