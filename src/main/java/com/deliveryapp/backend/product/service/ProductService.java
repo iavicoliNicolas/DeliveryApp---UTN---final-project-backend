@@ -5,6 +5,7 @@ import com.deliveryapp.backend.common.pagination.PaginationResult;
 import com.deliveryapp.backend.common.services.AuthFacadeService;
 import com.deliveryapp.backend.product.dto.ProductRequestDTO;
 import com.deliveryapp.backend.product.dto.ProductResponseDTO;
+import com.deliveryapp.backend.product.exception.InvalidParameterSortByException;
 import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.exception.ProductSearchMissingLocationException;
 import com.deliveryapp.backend.product.filter.ProductFilter;
@@ -45,17 +46,25 @@ public class ProductService implements IProductService {
     @Transactional(readOnly = true)
     public PaginationResult<ProductResponseDTO> findAll(PaginationQuery paginationQuery, ProductFilter productFilter) {
 
-        PageRequest pageRequest = PageRequest.of(
-                paginationQuery.getPage(),
-                paginationQuery.getSize(),
-                Sort.by(Sort.Direction.fromString(paginationQuery.getDirection()), paginationQuery.getSortBy())
-        );
+        if (!(paginationQuery.getDirection().equalsIgnoreCase("asc") || paginationQuery.getDirection().equalsIgnoreCase("desc"))) {
+            throw new InvalidParameterSortByException("Parametro direction solo acepta valores: asc , desc");
+        }
+        if (!(paginationQuery.getSortBy().equalsIgnoreCase("id") || paginationQuery.getSortBy().equalsIgnoreCase("name")
+                || paginationQuery.getSortBy().equalsIgnoreCase("price") || paginationQuery.getSortBy().equalsIgnoreCase("status")
+        )) {
+            throw new InvalidParameterSortByException("Parametro sortBy solo acepta valores: id , name, price, status");
+        }
 
         if (authFacadeService.isRole(ERole.ROLE_CONSUMER) &&
                 (productFilter.getLatitude() == null || productFilter.getLongitude() == null || productFilter.getDistance() == null)) {
             throw new ProductSearchMissingLocationException("Falta parametro Latitude, Longitude y Distance");
         }
 
+        PageRequest pageRequest = PageRequest.of(
+                paginationQuery.getPage(),
+                paginationQuery.getSize(),
+                Sort.by(Sort.Direction.fromString(paginationQuery.getDirection()), paginationQuery.getSortBy())
+        );
 
         Specification<Product> specification = Specification.allOf(
                 ProductSpecification.byName(productFilter.getName())
