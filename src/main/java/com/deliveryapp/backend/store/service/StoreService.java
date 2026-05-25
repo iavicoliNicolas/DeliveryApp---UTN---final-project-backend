@@ -52,10 +52,8 @@ public class StoreService implements IStoreService{
             );
         }
 
-        if (authFacadeService.isRole(ERole.ROLE_CONSUMER)
-                && (storeFilter.getLatitude() == null
-                || storeFilter.getLongitude() == null
-                || storeFilter.getDistance() == null)) {
+        if (authFacadeService.isRole(ERole.ROLE_CONSUMER) &&
+                (storeFilter.getLatitude() == null || storeFilter.getLongitude() == null || storeFilter.getDistance() == null)) {
 
             throw new StoreSearchMissingLocationException(
                     "Falta parametro Latitude, Longitude y Distance"
@@ -65,9 +63,7 @@ public class StoreService implements IStoreService{
         PageRequest pageRequest = PageRequest.of(
                 paginationQuery.getPage(),
                 paginationQuery.getSize(),
-                Sort.by(
-                        Sort.Direction.fromString(paginationQuery.getDirection()),
-                        paginationQuery.getSortBy()
+                Sort.by(Sort.Direction.fromString(paginationQuery.getDirection()), paginationQuery.getSortBy()
                 )
         );
 

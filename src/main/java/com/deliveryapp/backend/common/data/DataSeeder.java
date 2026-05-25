@@ -15,9 +15,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.IntStream;
+
+import static io.micrometer.common.util.StringUtils.truncate;
 
 @Component
 @RequiredArgsConstructor
@@ -34,6 +37,7 @@ public class DataSeeder implements CommandLineRunner {
 
         userRepository.deleteAll();
         storeRepository.deleteAll();
+        productRepository.deleteAll();
 
         if (userRepository.count() == 0) {
             userRepository.save(
@@ -97,6 +101,19 @@ public class DataSeeder implements CommandLineRunner {
                             .build()
             );
 
+            List<Store> stores = IntStream.rangeClosed(1,20)
+                    .mapToObj(i -> Store.builder()
+                            .name(truncate(faker.company().name(), 25))
+                            .address(truncate(faker.address().streetAddress(), 40))
+                                    .latitude(BigDecimal.valueOf(faker.number().randomDouble(7, -38, -37))
+                                            .setScale(7, RoundingMode.HALF_UP))
+                                    .longitude(BigDecimal.valueOf(faker.number().randomDouble(7, -58, -57))
+                                            .setScale(7, RoundingMode.HALF_UP))
+                            .owner(userRepository.findByEmail("pedronight@mail.com").get())
+                            .build()
+                    ).toList();
+
+            storeRepository.saveAll(stores);
 
             List<Product> products = IntStream.rangeClosed(1, 100)
                     .mapToObj(i -> Product.builder()
