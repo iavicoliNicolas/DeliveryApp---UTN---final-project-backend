@@ -71,9 +71,9 @@ public class ProductController {
 
     //Como Comerciante quiero realizar Baja de productos de mi comercio
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteById(id);
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body("Product with id " + id + " deleted");
+        return ResponseEntity.noContent().build();
     }
 
 
