@@ -55,6 +55,12 @@ public class OrderController {
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body("Order with id " + id + " deleted");
     }
 
+    @GetMapping("/store/{storeId}")
+    public ResponseEntity<List<OrderResponseDTO>> findOrdersByStore(@PathVariable Long storeId) {
+    return ResponseEntity.status(HttpStatusCode.valueOf(200))
+            .body(orderService.findByStoreId(storeId));
+    }
 
+    
 
 }
