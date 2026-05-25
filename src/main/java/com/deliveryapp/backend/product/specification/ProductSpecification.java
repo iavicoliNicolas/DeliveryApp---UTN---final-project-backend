@@ -60,8 +60,8 @@ public class ProductSpecification {
             if (distance == null || latitude == null || longitude == null) {
                 return null;
             }
-            BigDecimal latitudeA = latitude.add(BigDecimal.valueOf((double) distance / 111111));
-            BigDecimal latitudeB = latitude.subtract(BigDecimal.valueOf((double) distance / 111111));
+            BigDecimal latitudeA = latitude.add(BigDecimal.valueOf((double) distance / 111));
+            BigDecimal latitudeB = latitude.subtract(BigDecimal.valueOf((double) distance / 111));
             return cb.between(root.get("store").get("latitude"),
                     latitudeB, latitudeA);
         };
@@ -74,8 +74,8 @@ public class ProductSpecification {
             if (distance == null || latitude == null || longitude == null) {
                 return null;
             }
-            BigDecimal longitudeA = longitude.add(BigDecimal.valueOf((double) distance / 111111));
-            BigDecimal longitudeB = longitude.subtract(BigDecimal.valueOf((double) distance / 111111));
+            BigDecimal longitudeA = longitude.add(BigDecimal.valueOf((double) distance / 111));
+            BigDecimal longitudeB = longitude.subtract(BigDecimal.valueOf((double) distance / 111));
 
             return cb.between(root.get("store").get("longitude"),
                     longitudeB, longitudeA);

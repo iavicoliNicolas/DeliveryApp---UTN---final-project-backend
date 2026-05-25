@@ -25,10 +25,10 @@ public class StoreSpecification {
             }
 
             BigDecimal latitudeA =
-                    latitude.add(BigDecimal.valueOf((double) distance / 111111));
+                    latitude.add(BigDecimal.valueOf((double) distance / 111));
 
             BigDecimal latitudeB =
-                    latitude.subtract(BigDecimal.valueOf((double) distance / 111111));
+                    latitude.subtract(BigDecimal.valueOf((double) distance / 111));
 
             return cb.between(
                     root.get("latitude"), latitudeB, latitudeA
@@ -45,10 +45,10 @@ public class StoreSpecification {
             }
 
             BigDecimal longitudeA =
-                    longitude.add(BigDecimal.valueOf((double) distance / 111111));
+                    longitude.add(BigDecimal.valueOf((double) distance / 111));
 
             BigDecimal longitudeB =
-                    longitude.subtract(BigDecimal.valueOf((double) distance / 111111));
+                    longitude.subtract(BigDecimal.valueOf((double) distance / 111));
 
             return cb.between(
                     root.get("longitude"), longitudeB, longitudeA
