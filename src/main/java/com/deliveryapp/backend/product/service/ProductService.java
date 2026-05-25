@@ -5,7 +5,9 @@ import com.deliveryapp.backend.common.pagination.PaginationResult;
 import com.deliveryapp.backend.common.services.AuthFacadeService;
 import com.deliveryapp.backend.product.dto.ProductRequestDTO;
 import com.deliveryapp.backend.product.dto.ProductResponseDTO;
+import com.deliveryapp.backend.product.exception.InvalidParameterSortByException;
 import com.deliveryapp.backend.product.exception.ProductNotFoundException;
+import com.deliveryapp.backend.product.exception.ProductSearchMissingLocationException;
 import com.deliveryapp.backend.product.filter.ProductFilter;
 import com.deliveryapp.backend.product.mapper.ProductMapper;
 import com.deliveryapp.backend.product.model.Product;
@@ -14,6 +16,7 @@ import com.deliveryapp.backend.product.specification.ProductSpecification;
 import com.deliveryapp.backend.store.exception.StoreNotFoundException;
 import com.deliveryapp.backend.store.model.Store;
 import com.deliveryapp.backend.store.repository.StoreRepository;
+import com.deliveryapp.backend.user.enums.ERole;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
@@ -21,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +43,22 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PaginationResult<ProductResponseDTO> findAll(PaginationQuery paginationQuery, ProductFilter productFilter) {
+
+        if (!(paginationQuery.getDirection().equalsIgnoreCase("asc") || paginationQuery.getDirection().equalsIgnoreCase("desc"))) {
+            throw new InvalidParameterSortByException("Parametro direction solo acepta valores: asc , desc");
+        }
+        if (!(paginationQuery.getSortBy().equalsIgnoreCase("id") || paginationQuery.getSortBy().equalsIgnoreCase("name")
+                || paginationQuery.getSortBy().equalsIgnoreCase("price") || paginationQuery.getSortBy().equalsIgnoreCase("status")
+        )) {
+            throw new InvalidParameterSortByException("Parametro sortBy solo acepta valores: id , name, price, status");
+        }
+
+        if (authFacadeService.isRole(ERole.ROLE_CONSUMER) &&
+                (productFilter.getLatitude() == null || productFilter.getLongitude() == null || productFilter.getDistance() == null)) {
+            throw new ProductSearchMissingLocationException("Falta parametro Latitude, Longitude y Distance");
+        }
 
         PageRequest pageRequest = PageRequest.of(
                 paginationQuery.getPage(),
@@ -69,6 +88,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ProductResponseDTO save(ProductRequestDTO productRequestDTO) {
         Store existingStore = getExistingStore(productRequestDTO);
         isOwnerVerification(existingStore);
@@ -83,6 +103,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ProductResponseDTO update(Long id, ProductRequestDTO productRequestDTO) {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(
@@ -111,6 +132,7 @@ public class ProductService implements IProductService {
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteById(Long id) {
 
         Product existingProduct = productRepository.findById(id)

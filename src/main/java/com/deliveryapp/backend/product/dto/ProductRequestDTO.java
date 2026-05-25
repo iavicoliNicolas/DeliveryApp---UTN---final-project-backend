@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 public class ProductRequestDTO {
 
     @NotBlank(message = "El nombre del producto no puede estar vacío")
-    @Size(max = 25, message = "El nombre del producto no puede superar los 25 caracteres")
+    @Size(min = 3, max = 40, message = "El nombre del producto no puede superar los 40 caracteres ni tener menos de 3 caracteres")
     private String name;
 
     @NotNull(message = "El precio del producto no puede ser nulo")
