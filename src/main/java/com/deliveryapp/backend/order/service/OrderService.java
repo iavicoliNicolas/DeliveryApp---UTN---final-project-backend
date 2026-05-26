@@ -180,4 +180,12 @@ public class OrderService implements IOrderService {
                 .map(OrderMapper::toResponse)
                 .toList();
     }
+
+    @Override
+    public List<OrderResponseDTO> findUnassignedOrders() {
+        return orderRepository.findByRiderIsNullAndStatus(EOrderStatus.CONFIRMED)
+                .stream()
+                .map(OrderMapper::toResponse)
+                .toList();
+    }
 }

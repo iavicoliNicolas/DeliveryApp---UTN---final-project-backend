@@ -61,6 +61,10 @@ public class OrderController {
             .body(orderService.findByStoreId(storeId));
     }
 
-    
+    @GetMapping("/unassigned")
+    public ResponseEntity<List<OrderResponseDTO>> findUnassignedOrders() {
+        return ResponseEntity.status(HttpStatusCode.valueOf(200))
+                .body(orderService.findUnassignedOrders());
+    }
 
 }
