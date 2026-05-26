@@ -31,34 +31,37 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorMessage("Error en validacion", ex.getClass().getSimpleName(), request.getRequestURI(), errors));
-    }
+        }
 
-    @ExceptionHandler({
-            ProductSearchMissingLocationException.class, InvalidParameterSortByException.class
-    })
-    public ResponseEntity<ErrorMessage> handleBadRequestExceptions(HttpServletRequest request, Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorMessage(ex.getMessage(), ex.getClass().getSimpleName(), request.getRequestURI()));
-    }
+        @ExceptionHandler({
+                ProductSearchMissingLocationException.class, InvalidParameterSortByException.class
+        })
+        public ResponseEntity<ErrorMessage> handleBadRequestExceptions(HttpServletRequest request, Exception ex) {
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(new ErrorMessage(ex.getMessage(), ex.getClass().getSimpleName(), request.getRequestURI()));
+        }
 
-    @ExceptionHandler({
-            ProductNotFoundException.class, StoreNotFoundException.class, UserNotFoundException.class, OrderNotFoundException.class
-    })
-    public ResponseEntity<ErrorMessage> handleElementNotFoundException(HttpServletRequest request, Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(new ErrorMessage(ex.getMessage(), ex.getClass().getSimpleName(), request.getRequestURI()));
-    }
+        @ExceptionHandler({
+                ProductNotFoundException.class, StoreNotFoundException.class, UserNotFoundException.class, OrderNotFoundException.class
+        })
+        public ResponseEntity<ErrorMessage> handleElementNotFoundException(HttpServletRequest request, Exception ex) {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body(new ErrorMessage(ex.getMessage(), ex.getClass().getSimpleName(), request.getRequestURI()));
+        }
 
-    @ExceptionHandler({
-            AuthenticationException.class
-    })
-    public ResponseEntity<ErrorMessage> handleAuthenticationExceptions(HttpServletRequest request, Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(new ErrorMessage(ex.getMessage(), ex.getClass().getSimpleName(), request.getRequestURI()));
-    }
+        @ExceptionHandler({
+                AuthenticationException.class
+        })
+        public ResponseEntity<ErrorMessage> handleAuthenticationExceptions(HttpServletRequest request, Exception ex) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body(new ErrorMessage(ex.getMessage(), ex.getClass().getSimpleName(), request.getRequestURI()));
+        }
 
-
+        @ExceptionHandler(OrderException.class) public ResponseEntity<ErrorMessage> handleOrderException(HttpServletRequest request, OrderException ex) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorMessage(...));
+        //409
+        }               
 }
