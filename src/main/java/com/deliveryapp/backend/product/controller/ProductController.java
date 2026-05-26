@@ -25,22 +25,10 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<PaginationResult<ProductResponseDTO>> findAllProducts(
-            @RequestParam(defaultValue = "5") int pageSize,
-            @RequestParam(defaultValue = "0") int pageNumber,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) BigDecimal priceMin,
-            @RequestParam(required = false) BigDecimal priceMax,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) Long storeId,
-            @RequestParam(required = false) BigDecimal latitude,
-            @RequestParam(required = false) BigDecimal longitude,
-            @RequestParam(required = false) Integer distance
+
+            @ModelAttribute PaginationQuery paginationQuery,
+            @ModelAttribute ProductFilter productFilter
     ) {
-        PaginationQuery paginationQuery = new PaginationQuery(pageNumber, pageSize, sortBy, direction);
-        ProductFilter productFilter = new ProductFilter(name, description, priceMin, priceMax, status, storeId, latitude, longitude, distance);
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(productService.findAll(paginationQuery, productFilter));
     }

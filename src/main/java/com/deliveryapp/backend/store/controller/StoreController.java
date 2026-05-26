@@ -24,19 +24,10 @@ public class StoreController {
     @GetMapping
     public ResponseEntity<PaginationResult<StoreResponseDTO>> findAllStores(
 
-            @RequestParam(defaultValue = "5") int pageSize,
-            @RequestParam(defaultValue = "0") int pageNumber,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) BigDecimal latitude,
-            @RequestParam(required = false) BigDecimal longitude,
-            @RequestParam(required = false) Integer distance
+            @ModelAttribute PaginationQuery paginationQuery,
+            @ModelAttribute StoreFilter storeFilter
     ) {
 
-        PaginationQuery paginationQuery = new PaginationQuery(pageNumber, pageSize, sortBy, direction);
-
-        StoreFilter storeFilter = new StoreFilter(name, latitude, longitude, distance);
 
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(storeService.findAll(paginationQuery, storeFilter));
     }
