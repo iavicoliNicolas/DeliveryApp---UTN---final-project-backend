@@ -1,5 +1,9 @@
 package com.deliveryapp.backend.common.data;
 
+import com.deliveryapp.backend.order.enums.EOrderStatus;
+import com.deliveryapp.backend.order.enums.EPaymentType;
+import com.deliveryapp.backend.order.model.Order;
+import com.deliveryapp.backend.order.repository.OrderRepository;
 import com.deliveryapp.backend.product.enums.EProductStatus;
 import com.deliveryapp.backend.product.model.Product;
 import com.deliveryapp.backend.product.repository.ProductRepository;
@@ -29,6 +33,7 @@ public class DataSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final PasswordEncoder passwordEncoder;
+    private final OrderRepository orderRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -38,6 +43,7 @@ public class DataSeeder implements CommandLineRunner {
         userRepository.deleteAll();
         storeRepository.deleteAll();
         productRepository.deleteAll();
+        orderRepository.deleteAll();
 
         if (userRepository.count() == 0) {
             userRepository.save(
@@ -128,6 +134,97 @@ public class DataSeeder implements CommandLineRunner {
 
             productRepository.saveAll(products);
 
+            List<Product> pizzaProducts = productRepository.findAll()
+                    .stream()
+                    .filter(product -> product.getStore().getId().equals(1L))
+                    .limit(3)
+                    .toList();
+
+            User consumer = userRepository.findByEmail("juanSky@mail.com").get();
+
+            User rider = userRepository.findByEmail("ana@mail.com").get();
+
+            Store pizzaStore = storeRepository.findById(1L).get();
+
+            orderRepository.save(
+                    Order.builder()
+                            .consumer(consumer)
+                            .rider(null)
+                            .store(pizzaStore)
+                            .products(List.of(
+                                    pizzaProducts.get(0),
+                                    pizzaProducts.get(1)
+                            ))
+                            .orderAddress("Av Colon 1234")
+                            .latitude(BigDecimal.valueOf(-37.9970000))
+                            .longitude(BigDecimal.valueOf(-57.5500000))
+                            .total(
+                                    pizzaProducts.get(0).getPrice()
+                                            .add(pizzaProducts.get(1).getPrice())
+                            )
+                            .status(EOrderStatus.PENDING)
+                            .paymentType(EPaymentType.EFECTIVO)
+                            .build()
+            );
+
+            orderRepository.save(
+                    Order.builder()
+                            .consumer(consumer)
+                            .rider(rider)
+                            .store(pizzaStore)
+                            .products(List.of(
+                                    pizzaProducts.get(1),
+                                    pizzaProducts.get(2)
+                            ))
+                            .orderAddress("Av Independencia 4321")
+                            .latitude(BigDecimal.valueOf(-37.9911111))
+                            .longitude(BigDecimal.valueOf(-57.5611111))
+                            .total(
+                                    pizzaProducts.get(1).getPrice()
+                                            .add(pizzaProducts.get(2).getPrice())
+                            )
+                            .status(EOrderStatus.CONFIRMED)
+                            .paymentType(EPaymentType.TRANSFERENCIA)
+                            .build()
+            );
+
+            orderRepository.save(
+                    Order.builder()
+                            .consumer(consumer)
+                            .rider(rider)
+                            .store(pizzaStore)
+                            .products(List.of(
+                                    pizzaProducts.get(0)
+                            ))
+                            .orderAddress("Calle Falsa 123")
+                            .latitude(BigDecimal.valueOf(-37.9855555))
+                            .longitude(BigDecimal.valueOf(-57.5755555))
+                            .total(
+                                    pizzaProducts.get(0).getPrice()
+                            )
+                            .status(EOrderStatus.COMPLETED)
+                            .paymentType(EPaymentType.EFECTIVO)
+                            .build()
+            );
+
+            orderRepository.save(
+                    Order.builder()
+                            .consumer(consumer)
+                            .rider(null)
+                            .store(pizzaStore)
+                            .products(List.of(
+                                    pizzaProducts.get(2)
+                            ))
+                            .orderAddress("Diagonal Pueyrredon 555")
+                            .latitude(BigDecimal.valueOf(-37.9888888))
+                            .longitude(BigDecimal.valueOf(-57.5666666))
+                            .total(
+                                    pizzaProducts.get(2).getPrice()
+                            )
+                            .status(EOrderStatus.CANCELLED)
+                            .paymentType(EPaymentType.TRANSFERENCIA)
+                            .build()
+            );
 
             productRepository.save(
                     Product.builder()
