@@ -18,6 +18,5 @@ public interface IOrderService {
     OrderResponseDTO update (Long id, CreateOrderRequestDTO createOrderRequestDTO);
     OrderResponseDTO updateStatus (Long id, UpdateOrderRequestDTO updateOrderRequestDTO);
     void deleteById(Long id);
-    List<OrderResponseDTO> findByStoreId(Long storeId);
     List<OrderResponseDTO> findUnassignedOrders();
 }

@@ -20,7 +20,6 @@ import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.model.Product;
 import com.deliveryapp.backend.product.repository.ProductRepository;
 import com.deliveryapp.backend.store.model.Store;
-import com.deliveryapp.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +28,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import com.deliveryapp.backend.store.repository.StoreRepository;
 import com.deliveryapp.backend.store.exception.StoreNotFoundException;
-import com.deliveryapp.backend.store.repository.StoreRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -42,7 +40,6 @@ import java.util.Optional;
 public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
-    private final UserRepository userRepository;
     private final AuthFacadeService authFacadeService;
     private final StoreRepository storeRepository;
 
@@ -139,14 +136,14 @@ public class OrderService implements IOrderService {
         for(Long productId : dto.getProducts()){
             Optional<Product> optionalProduct = productRepository.findById(productId);
 
-            if(!optionalProduct.isPresent()){
+            if(optionalProduct.isEmpty()){
                 throw new ProductNotFoundException(productId);
             }
 
             if(optionalProduct.get().getStatus().equals(EProductStatus.UNAVAILABLE)){
                 throw new ProductException("El producto " + optionalProduct.get().getName() + " no está disponible");
             }
-            optionalProduct.ifPresent(product -> products.add(product));
+            optionalProduct.ifPresent(products::add);
         }
 
         if(dto.getProducts() == null || dto.getProducts().isEmpty()){
@@ -197,7 +194,7 @@ public class OrderService implements IOrderService {
             );
         }
 
-        Store store = products.get(0).getStore();
+        Store store = products.getFirst().getStore();
 
         BigDecimal total = products.stream()
                 .map(Product::getPrice)
@@ -244,27 +241,12 @@ public class OrderService implements IOrderService {
     @Override
     public void deleteById(Long id) {
 
-        Order existingOrder = orderRepository.findById(id)
+        orderRepository.findById(id)
                 .orElseThrow(
                         () -> new OrderNotFoundException(id)
                 );
 
         orderRepository.deleteById(id);
-    }
-
-    @Override
-    public List<OrderResponseDTO> findByStoreId(Long storeId) {
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new StoreNotFoundException(storeId));
-
-        if (!store.getOwner().equals(authFacadeService.getCurrentUser())) {
-            throw new StoreNotFoundException(storeId);
-        }
-
-        return orderRepository.findByStoreId(storeId)
-                .stream()
-                .map(OrderMapper::toResponse)
-                .toList();
     }
 
     @Override
