@@ -1,9 +1,12 @@
 package com.deliveryapp.backend.order.controller;
 
+import com.deliveryapp.backend.common.pagination.PaginationQuery;
+import com.deliveryapp.backend.common.pagination.PaginationResult;
 import com.deliveryapp.backend.order.dto.CreateOrderRequestDTO;
 import com.deliveryapp.backend.order.dto.OrderResponseDTO;
 import com.deliveryapp.backend.order.dto.UpdateOrderRequestDTO;
 import com.deliveryapp.backend.order.exception.OrderNotFoundException;
+import com.deliveryapp.backend.order.filter.OrderFilter;
 import com.deliveryapp.backend.order.service.IOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,9 +59,11 @@ public class OrderController {
     }
 
     @GetMapping("/store/{storeId}")
-    public ResponseEntity<List<OrderResponseDTO>> findOrdersByStore(@PathVariable Long storeId) {
-    return ResponseEntity.status(HttpStatusCode.valueOf(200))
-            .body(orderService.findByStoreId(storeId));
+    public ResponseEntity<PaginationResult<OrderResponseDTO>> findOrdersByStore(@PathVariable Long storeId,
+                                                                                @ModelAttribute PaginationQuery paginationQuery,
+                                                                                @ModelAttribute OrderFilter orderFilter) {
+        return ResponseEntity.status(HttpStatusCode.valueOf(200))
+                .body(orderService.findByStoreId(storeId, paginationQuery, orderFilter));
     }
 
     @GetMapping("/unassigned")
