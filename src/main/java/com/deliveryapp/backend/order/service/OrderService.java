@@ -1,15 +1,20 @@
 package com.deliveryapp.backend.order.service;
 
+import com.deliveryapp.backend.common.pagination.PaginationQuery;
+import com.deliveryapp.backend.common.pagination.PaginationResult;
 import com.deliveryapp.backend.common.services.AuthFacadeService;
 import com.deliveryapp.backend.order.dto.CreateOrderRequestDTO;
 import com.deliveryapp.backend.order.dto.OrderResponseDTO;
 import com.deliveryapp.backend.order.dto.UpdateOrderRequestDTO;
 import com.deliveryapp.backend.order.enums.EOrderStatus;
 import com.deliveryapp.backend.order.exception.OrderNotFoundException;
+import com.deliveryapp.backend.order.filter.OrderFilter;
 import com.deliveryapp.backend.order.mapper.OrderMapper;
 import com.deliveryapp.backend.order.model.Order;
 import com.deliveryapp.backend.order.repository.OrderRepository;
+import com.deliveryapp.backend.order.specification.OrderSpecification;
 import com.deliveryapp.backend.product.enums.EProductStatus;
+import com.deliveryapp.backend.product.exception.InvalidParameterSortByException;
 import com.deliveryapp.backend.product.exception.ProductException;
 import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.model.Product;
@@ -17,10 +22,15 @@ import com.deliveryapp.backend.product.repository.ProductRepository;
 import com.deliveryapp.backend.store.model.Store;
 import com.deliveryapp.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import com.deliveryapp.backend.store.repository.StoreRepository;
 import com.deliveryapp.backend.store.exception.StoreNotFoundException;
 import com.deliveryapp.backend.store.repository.StoreRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -35,6 +45,82 @@ public class OrderService implements IOrderService {
     private final UserRepository userRepository;
     private final AuthFacadeService authFacadeService;
     private final StoreRepository storeRepository;
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginationResult<OrderResponseDTO> findByStoreId(Long storeId, PaginationQuery paginationQuery, OrderFilter orderFilter) {
+
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() ->
+                        new StoreNotFoundException(storeId)
+                );
+
+        if (!store.getOwner().equals(authFacadeService.getCurrentUser())) {
+            throw new StoreNotFoundException(storeId);
+        }
+
+        if (!(paginationQuery.getDirection().equalsIgnoreCase("asc")
+                || paginationQuery.getDirection().equalsIgnoreCase("desc"))) {
+
+            throw new InvalidParameterSortByException(
+                    "Parametro direction solo acepta valores: asc , desc"
+            );
+        }
+
+        if (!(paginationQuery.getSortBy().equalsIgnoreCase("id")
+                || paginationQuery.getSortBy().equalsIgnoreCase("total")
+                || paginationQuery.getSortBy().equalsIgnoreCase("status")
+                || paginationQuery.getSortBy().equalsIgnoreCase("paymentType")
+                || paginationQuery.getSortBy().equalsIgnoreCase("lastUpdate"))) {
+
+            throw new InvalidParameterSortByException(
+                    "Parametro sortBy solo acepta valores: id , total, status, paymentType, lastUpdate"
+            );
+        }
+
+        PageRequest pageRequest = PageRequest.of(
+                paginationQuery.getPage(),
+                paginationQuery.getSize(),
+                Sort.by(
+                        Sort.Direction.fromString(
+                                paginationQuery.getDirection()
+                        ),
+                        paginationQuery.getSortBy()
+                )
+        );
+
+        Specification<Order> specification = Specification.allOf(
+                OrderSpecification.byStoreId(storeId)
+                        .and(
+                                OrderSpecification.byStatus(orderFilter.getStatus())
+                                        .and(
+                                                OrderSpecification.byPaymentType(orderFilter.getPaymentType())
+                                                        .and(
+                                                                OrderSpecification.byConsumerId(orderFilter.getConsumerId())
+                                                                        .and(
+                                                                                OrderSpecification.byTotal(
+                                                                                        orderFilter.getTotalMin(),
+                                                                                        orderFilter.getTotalMax()
+                                                                                )
+                                                                        )
+                                                        )
+                                        )
+                        )
+        );
+
+        Page<Order> page = orderRepository.findAll(specification, pageRequest);
+
+        return new PaginationResult<>(
+                page.getContent()
+                        .stream()
+                        .map(OrderMapper::toResponse)
+                        .toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements()
+        );
+    }
 
     @Override
     public List<OrderResponseDTO> findAll() {
