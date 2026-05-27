@@ -48,7 +48,7 @@ public class OrderController {
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderService.update(id,createOrderRequestDTO));
     }
 
-    @PatchMapping("/{id}/merchant-status")
+    @PatchMapping("/{id}/status")
     public ResponseEntity<OrderResponseDTO> updateMerchantOrderStatus(
             @PathVariable Long id,
             @Valid @RequestBody UpdateOrderStatusRequestDTO dto

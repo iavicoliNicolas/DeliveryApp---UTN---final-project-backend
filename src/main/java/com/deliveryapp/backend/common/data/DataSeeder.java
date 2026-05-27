@@ -155,9 +155,11 @@ public class DataSeeder implements CommandLineRunner {
                                     pizzaProducts.get(0),
                                     pizzaProducts.get(1)
                             ))
-                            .orderAddress("Av Colon 1234")
-                            .latitude(BigDecimal.valueOf(-37.9970000))
-                            .longitude(BigDecimal.valueOf(-57.5500000))
+                            .customerAddress("Av Colon 1234")
+                            .customerLatitude(BigDecimal.valueOf(-37.9970000))
+                            .customerLongitude(BigDecimal.valueOf(-57.5500000))
+                            .longitude(pizzaStore.getLongitude())
+                            .latitude(pizzaStore.getLatitude())
                             .total(
                                     pizzaProducts.get(0).getPrice()
                                             .add(pizzaProducts.get(1).getPrice())
@@ -176,9 +178,11 @@ public class DataSeeder implements CommandLineRunner {
                                     pizzaProducts.get(1),
                                     pizzaProducts.get(2)
                             ))
-                            .orderAddress("Av Independencia 4321")
-                            .latitude(BigDecimal.valueOf(-37.9911111))
-                            .longitude(BigDecimal.valueOf(-57.5611111))
+                            .customerAddress("Av Independencia 4321")
+                            .customerLatitude(BigDecimal.valueOf(-37.9911111))
+                            .customerLongitude(BigDecimal.valueOf(-57.5611111))
+                            .longitude(pizzaStore.getLongitude())
+                            .latitude(pizzaStore.getLatitude())
                             .total(
                                     pizzaProducts.get(1).getPrice()
                                             .add(pizzaProducts.get(2).getPrice())
@@ -196,9 +200,11 @@ public class DataSeeder implements CommandLineRunner {
                             .products(List.of(
                                     pizzaProducts.get(0)
                             ))
-                            .orderAddress("Calle Falsa 123")
-                            .latitude(BigDecimal.valueOf(-37.9855555))
-                            .longitude(BigDecimal.valueOf(-57.5755555))
+                            .customerAddress("Calle Falsa 123")
+                            .longitude(pizzaStore.getLongitude())
+                            .latitude(pizzaStore.getLatitude())
+                            .customerLatitude(BigDecimal.valueOf(-37.9855555))
+                            .customerLongitude(BigDecimal.valueOf(-57.5755555))
                             .total(
                                     pizzaProducts.get(0).getPrice()
                             )
@@ -215,9 +221,11 @@ public class DataSeeder implements CommandLineRunner {
                             .products(List.of(
                                     pizzaProducts.get(2)
                             ))
-                            .orderAddress("Diagonal Pueyrredon 555")
-                            .latitude(BigDecimal.valueOf(-37.9888888))
-                            .longitude(BigDecimal.valueOf(-57.5666666))
+                            .customerAddress("Diagonal Pueyrredon 555")
+                            .longitude(pizzaStore.getLongitude())
+                            .latitude(pizzaStore.getLatitude())
+                            .customerLatitude(BigDecimal.valueOf(-37.9888888))
+                            .customerLongitude(BigDecimal.valueOf(-57.5666666))
                             .total(
                                     pizzaProducts.get(2).getPrice()
                             )

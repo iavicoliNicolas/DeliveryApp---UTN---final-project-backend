@@ -206,11 +206,15 @@ public class OrderService implements IOrderService {
 
         order.setStore(store);
 
-        order.setOrderAddress(dto.getOrderAddress());
+        order.setCustomerAddress(dto.getCustomerAddress());
 
-        order.setLatitude(dto.getLatitude());
+        order.setCustomerLatitude(dto.getCustomerLatitude());
 
-        order.setLongitude(dto.getLongitude());
+        order.setCustomerLongitude(dto.getCustomerLongitude());
+
+        order.setLatitude(dto.getCustomerLatitude());
+
+        order.setCustomerLongitude(dto.getCustomerLongitude());
 
         order.setTotal(total);
 

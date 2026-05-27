@@ -41,7 +41,13 @@ public class Order {
     private Store store;
 
     @Column(name = "order_address", nullable = false, length = 50)
-    private String orderAddress;
+    private String customerAddress;
+
+    @Column(name = "latitude", nullable = false, precision = 10, scale = 7)
+    private BigDecimal customerLatitude;
+
+    @Column(name = "longitude", nullable = false, precision = 10, scale = 7)
+    private BigDecimal customerLongitude;
 
     @Column(name = "latitude", nullable = false, precision = 10, scale = 7)
     private BigDecimal latitude;

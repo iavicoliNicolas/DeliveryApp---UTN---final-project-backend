@@ -17,16 +17,16 @@ import java.util.List;
 public class CreateOrderRequestDTO {
 
     @NotNull(message = "La dirección de entrega no puede ser nula")
-    private String orderAddress;
+    private String customerAddress;
 
     @NotNull(message = "Debe haber mínimo un producto")
     private List<Long> products;
 
     @NotNull(message = "La latitud de la entrega no puede ser nula")
-    private BigDecimal latitude;
+    private BigDecimal customerLatitude;
 
     @NotNull(message = "La longitud de la entrega no puede ser nula")
-    private BigDecimal longitude;
+    private BigDecimal customerLongitude;
 
     @NotNull(message = "Debe seleccionar un método de pago")
     private EPaymentType paymentType;
