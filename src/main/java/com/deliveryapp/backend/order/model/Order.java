@@ -40,13 +40,13 @@ public class Order {
     @JoinColumn(name = "store_id")
     private Store store;
 
-    @Column(name = "order_address", nullable = false, length = 50)
+    @Column(name = "customer_address", nullable = false, length = 50)
     private String customerAddress;
 
-    @Column(name = "latitude", nullable = false, precision = 10, scale = 7)
+    @Column(name = "customer_latitude", nullable = false, precision = 10, scale = 7)
     private BigDecimal customerLatitude;
 
-    @Column(name = "longitude", nullable = false, precision = 10, scale = 7)
+    @Column(name = "customer_longitude", nullable = false, precision = 10, scale = 7)
     private BigDecimal customerLongitude;
 
     @Column(name = "latitude", nullable = false, precision = 10, scale = 7)
