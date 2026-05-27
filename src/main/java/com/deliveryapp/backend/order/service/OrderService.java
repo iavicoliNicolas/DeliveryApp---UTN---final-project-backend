@@ -5,7 +5,8 @@ import com.deliveryapp.backend.common.pagination.PaginationResult;
 import com.deliveryapp.backend.common.services.AuthFacadeService;
 import com.deliveryapp.backend.order.dto.CreateOrderRequestDTO;
 import com.deliveryapp.backend.order.dto.OrderResponseDTO;
-import com.deliveryapp.backend.order.dto.UpdateOrderRequestDTO;
+import com.deliveryapp.backend.order.dto.UpdateOrderLocationRequestDTO;
+import com.deliveryapp.backend.order.dto.UpdateOrderStatusRequestDTO;
 import com.deliveryapp.backend.order.enums.EOrderStatus;
 import com.deliveryapp.backend.order.exception.OrderNotFoundException;
 import com.deliveryapp.backend.order.filter.OrderFilter;
@@ -20,6 +21,7 @@ import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.model.Product;
 import com.deliveryapp.backend.product.repository.ProductRepository;
 import com.deliveryapp.backend.store.model.Store;
+import com.deliveryapp.backend.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -220,18 +222,51 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public OrderResponseDTO updateStatus(Long id, UpdateOrderRequestDTO updateOrderRequestDTO) {
+    public OrderResponseDTO updateMerchantOrderStatus(
+            Long id,
+            UpdateOrderStatusRequestDTO dto
+    ) {
 
         Order order = orderRepository.findById(id)
                 .orElseThrow(() ->
                         new OrderNotFoundException(id)
                 );
 
-        order.setLatitude(updateOrderRequestDTO.getLatitude());
+        User currentUser = authFacadeService.getCurrentUser();
 
-        order.setLongitude(updateOrderRequestDTO.getLongitude());
+        if (!order.getStore().getOwner().equals(currentUser)) {
 
-        order.setStatus(updateOrderRequestDTO.getStatus());
+            throw new StoreNotFoundException(currentUser.getId());
+        }
+
+        if (order.getStatus() != EOrderStatus.PENDING) {
+
+            throw new RuntimeException(
+                    "Solo se pueden modificar pedidos pendientes"
+            );
+        }
+
+        order.setStatus(dto.getStatus());
+
+        Order updatedOrder = orderRepository.save(order);
+
+        return OrderMapper.toResponse(updatedOrder);
+    }
+
+    @Override
+    public OrderResponseDTO updateOrderLocation(
+            Long id,
+            UpdateOrderLocationRequestDTO dto
+    ) {
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() ->
+                        new OrderNotFoundException(id)
+                );
+
+        order.setLatitude(dto.getLatitude());
+
+        order.setLongitude(dto.getLongitude());
 
         Order updatedOrder = orderRepository.save(order);
 

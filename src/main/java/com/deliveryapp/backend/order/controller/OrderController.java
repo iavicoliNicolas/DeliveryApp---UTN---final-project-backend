@@ -4,7 +4,8 @@ import com.deliveryapp.backend.common.pagination.PaginationQuery;
 import com.deliveryapp.backend.common.pagination.PaginationResult;
 import com.deliveryapp.backend.order.dto.CreateOrderRequestDTO;
 import com.deliveryapp.backend.order.dto.OrderResponseDTO;
-import com.deliveryapp.backend.order.dto.UpdateOrderRequestDTO;
+import com.deliveryapp.backend.order.dto.UpdateOrderLocationRequestDTO;
+import com.deliveryapp.backend.order.dto.UpdateOrderStatusRequestDTO;
 import com.deliveryapp.backend.order.exception.OrderNotFoundException;
 import com.deliveryapp.backend.order.filter.OrderFilter;
 import com.deliveryapp.backend.order.service.IOrderService;
@@ -43,13 +44,28 @@ public class OrderController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrderResponseDTO> updateOrder(@Valid @PathVariable Long id, @RequestBody CreateOrderRequestDTO createOorderRequestDTO){
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderService.update(id,createOorderRequestDTO));
+    public ResponseEntity<OrderResponseDTO> updateOrder(@Valid @PathVariable Long id, @RequestBody CreateOrderRequestDTO createOrderRequestDTO){
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderService.update(id,createOrderRequestDTO));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<OrderResponseDTO> updateOrderStatus(@Valid @PathVariable Long id, @RequestBody UpdateOrderRequestDTO updateOrderRequestDTO){
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderService.updateStatus(id,updateOrderRequestDTO));
+    @PatchMapping("/{id}/merchant-status")
+    public ResponseEntity<OrderResponseDTO> updateMerchantOrderStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateOrderStatusRequestDTO dto
+    ) {
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200))
+                .body(orderService.updateMerchantOrderStatus(id, dto));
+    }
+
+    @PatchMapping("/{id}/location")
+    public ResponseEntity<OrderResponseDTO> updateOrderLocation(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateOrderLocationRequestDTO dto
+    ) {
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(200))
+                .body(orderService.updateOrderLocation(id, dto));
     }
 
     @DeleteMapping("/{id}")
