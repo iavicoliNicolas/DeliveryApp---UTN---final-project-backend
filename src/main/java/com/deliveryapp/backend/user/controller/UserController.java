@@ -1,7 +1,9 @@
 package com.deliveryapp.backend.user.controller;
 
+import com.deliveryapp.backend.common.services.AuthFacadeService;
 import com.deliveryapp.backend.user.dto.UserRequestDTO;
 import com.deliveryapp.backend.user.dto.UserResponseDTO;
+import com.deliveryapp.backend.user.dto.UserUpdateRequestDTO;
 import com.deliveryapp.backend.user.enums.ERole;
 import com.deliveryapp.backend.user.exception.UserNotFoundException;
 import com.deliveryapp.backend.user.service.IUserService;
@@ -20,6 +22,7 @@ import java.util.List;
 public class UserController {
     private final IUserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final AuthFacadeService authFacadeService;
 
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> findAllUsers(
@@ -61,4 +64,32 @@ public class UserController {
         userService.deleteById(id);
         return ResponseEntity.ok("User with id " + id + " deleted");
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> findMyProfile() {
+        Long id = authFacadeService.getCurrentUser().getId();
+        UserResponseDTO userResponseDTO = userService.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+        return ResponseEntity.ok(userResponseDTO);
+    }
+
+
+    @PatchMapping("/me")
+    public ResponseEntity<UserResponseDTO> updateMyProfile(@RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
+
+        Long id = authFacadeService.getCurrentUser().getId();
+        userUpdateRequestDTO.setPassword(passwordEncoder.encode(userUpdateRequestDTO.getPassword()));
+
+        return ResponseEntity.ok(userService.saveMyUserProfile(id, userUpdateRequestDTO));
+
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteMyProfile() {
+        Long id = authFacadeService.getCurrentUser().getId();
+        userService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

@@ -23,7 +23,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-       return http
+        return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/api/v1/auth/register").permitAll()
@@ -33,33 +33,42 @@ public class SecurityConfig {
                                 "/swagger").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
 
-                        .requestMatchers(HttpMethod.GET,"/api/v1/products").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
-                        .requestMatchers(HttpMethod.GET,"/api/v1/products/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
-                        .requestMatchers(HttpMethod.POST,"/api/v1/products").hasRole( "MERCHANT")
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/products/**").hasRole("MERCHANT")
-                        .requestMatchers(HttpMethod.DELETE,"/api/v1/products/**").hasRole("MERCHANT")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/products").hasRole("MERCHANT")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").hasRole("MERCHANT")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").hasRole("MERCHANT")
 
-                        .requestMatchers(HttpMethod.GET,"/api/v1/stores").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
-                        .requestMatchers(HttpMethod.GET,"/api/v1/stores/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
-                        .requestMatchers(HttpMethod.POST,"/api/v1/stores").hasRole( "MERCHANT")
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/stores/**").hasRole("MERCHANT")
-                        .requestMatchers(HttpMethod.DELETE,"/api/v1/stores/**").hasRole("MERCHANT")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/stores").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/stores/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/stores").hasRole("MERCHANT")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/stores/**").hasRole("MERCHANT")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/stores/**").hasRole("MERCHANT")
 
-                        .requestMatchers(HttpMethod.GET,"/api/v1/orders").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/orders/**").hasAnyRole("RIDER", "MERCHANT")
                         .requestMatchers(HttpMethod.GET, "/api/v1/orders/unassigned").hasRole("RIDER")
-                        .requestMatchers(HttpMethod.GET,"/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
-                        .requestMatchers(HttpMethod.POST,"/api/v1/orders").hasRole( "CONSUMER")
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
-                        .requestMatchers(HttpMethod.DELETE,"/api/v1/orders/**").hasAnyRole("ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasRole("CONSUMER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/orders/**").hasAnyRole("ADMINISTRATOR")
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/me").hasAnyRole("MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/users/me").hasAnyRole("MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/me").hasAnyRole("MERCHANT", "RIDER", "CONSUMER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole("ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/**").hasRole("ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users").hasRole("ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasRole("ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasRole("ADMINISTRATOR")
 
 
                         .anyRequest().authenticated()
 
                 )
-                 .headers(headers -> headers
-                      .frameOptions(frame -> frame.sameOrigin()) // Allow frames from same origin para que funcione h2-console
-                 )
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin()) // Allow frames from same origin para que funcione h2-console
+                )
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -68,22 +77,22 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
 
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(){
+    public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(userDetailService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config){
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
         return config.getAuthenticationManager();
     }
 
-    
+
 }

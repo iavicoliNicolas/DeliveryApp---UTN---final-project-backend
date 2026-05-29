@@ -2,6 +2,7 @@ package com.deliveryapp.backend.user.service;
 
 import com.deliveryapp.backend.user.dto.UserRequestDTO;
 import com.deliveryapp.backend.user.dto.UserResponseDTO;
+import com.deliveryapp.backend.user.dto.UserUpdateRequestDTO;
 import com.deliveryapp.backend.user.enums.ERole;
 import com.deliveryapp.backend.user.model.User;
 
@@ -16,6 +17,8 @@ public interface IUserService {
     Optional<UserResponseDTO> findById(Long id);
 
     UserResponseDTO save(UserRequestDTO userRequestDTO);
+
+    UserResponseDTO saveMyUserProfile(Long id, UserUpdateRequestDTO userUpdateRequestDTO);
 
     UserResponseDTO update(Long id, UserRequestDTO userRequestDTO);
 
