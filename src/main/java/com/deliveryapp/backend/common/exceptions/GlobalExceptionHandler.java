@@ -6,8 +6,10 @@ import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.exception.ProductSearchMissingLocationException;
 import com.deliveryapp.backend.store.exception.StoreNotFoundException;
 import com.deliveryapp.backend.user.exception.UserNotFoundException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -51,13 +53,22 @@ public class GlobalExceptionHandler {
                 .body(new ErrorMessage(ex.getMessage(), ex.getClass().getSimpleName(), request.getRequestURI()));
     }
 
+    /*    @ExceptionHandler({
+                AuthenticationException.class
+        })
+        public ResponseEntity<ErrorMessage> handleAuthenticationExceptions(HttpServletRequest request, Exception ex) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorMessage(ex.getMessage(), ex.getClass().getSimpleName(), request.getRequestURI()));
+        }
+    */
     @ExceptionHandler({
-            AuthenticationException.class
+            JwtException.class, AuthenticationException.class
     })
-    public ResponseEntity<ErrorMessage> handleAuthenticationExceptions(HttpServletRequest request, Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(new ErrorMessage(ex.getMessage(), ex.getClass().getSimpleName(), request.getRequestURI()));
+    public ResponseEntity<ErrorMessage> forbidden(HttpServletRequest request, Exception exception) {
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(403))
+                .body(new ErrorMessage(exception.getMessage(), exception.getClass().getSimpleName(), request.getRequestURI()));
     }
 
     /**

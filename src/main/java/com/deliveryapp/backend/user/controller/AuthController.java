@@ -1,15 +1,23 @@
 package com.deliveryapp.backend.user.controller;
 
+import com.deliveryapp.backend.common.services.AuthFacadeService;
+import com.deliveryapp.backend.common.services.JwtService;
+import com.deliveryapp.backend.user.dto.LoginRequestDTO;
+import com.deliveryapp.backend.user.dto.RegisterRequestDTO;
+import com.deliveryapp.backend.user.dto.TokenResponseDTO;
 import com.deliveryapp.backend.user.dto.UserRequestDTO;
-import com.deliveryapp.backend.user.dto.UserResponseDTO;
+import com.deliveryapp.backend.user.enums.ERole;
 import com.deliveryapp.backend.user.mapper.UserMapper;
 import com.deliveryapp.backend.user.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -18,27 +26,46 @@ public class AuthController {
     private final IUserService userService;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final AuthFacadeService authFacadeService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> registerUser(
-            @Valid @RequestBody UserRequestDTO userRequestDTO) {
+    public ResponseEntity<TokenResponseDTO> registerUser(
+            @Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
 
-        if(userService.existsUserByEmail(userRequestDTO.getEmail())) {
+        if (userService.existsUserByEmail(registerRequestDTO.getEmail())) {
             throw new RuntimeException("El email ya está utilizado");
         }
 
-        userRequestDTO.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
+        UserRequestDTO userRequestDTO = new UserRequestDTO();
+        userRequestDTO.setEmail(registerRequestDTO.getEmail());
+        userRequestDTO.setPassword(passwordEncoder.encode(registerRequestDTO.getPassword()));
+        ERole role = registerRequestDTO.getRole() != null ? registerRequestDTO.getRole() : ERole.ROLE_CONSUMER;
+        userRequestDTO.setRole(role);
+        userRequestDTO.setName(registerRequestDTO.getName());
+        userRequestDTO.setLastName(registerRequestDTO.getLastName());
 
-        var user = userMapper.toEntity(userRequestDTO);
-        var savedUser = userService.save(userMapper.toRequest(user));
+        userService.save(userRequestDTO);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        UserDetails userDetails = authFacadeService.authenticate(registerRequestDTO.getEmail(), registerRequestDTO.getPassword());
+
+        TokenResponseDTO tokenResponseDTO = new TokenResponseDTO();
+
+        tokenResponseDTO.setToken(jwtService.generateToken(userDetails));
+
+        return ResponseEntity.ok(tokenResponseDTO);
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<String> loginUser() {
+    public ResponseEntity<TokenResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
 
-        return ResponseEntity.status(HttpStatus.OK).body("");
+        UserDetails userDetails = authFacadeService.authenticate(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
+
+        String token = jwtService.generateToken(userDetails);
+
+        TokenResponseDTO tokenResponseDTO = new TokenResponseDTO();
+        tokenResponseDTO.setToken(token);
+
+        return ResponseEntity.ok(tokenResponseDTO);
     }
 
 }
