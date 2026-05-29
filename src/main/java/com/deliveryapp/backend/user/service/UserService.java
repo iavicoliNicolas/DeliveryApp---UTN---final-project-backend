@@ -2,13 +2,13 @@ package com.deliveryapp.backend.user.service;
 
 import com.deliveryapp.backend.user.dto.UserRequestDTO;
 import com.deliveryapp.backend.user.dto.UserResponseDTO;
+import com.deliveryapp.backend.user.dto.UserUpdateRequestDTO;
 import com.deliveryapp.backend.user.enums.ERole;
 import com.deliveryapp.backend.user.exception.UserNotFoundException;
 import com.deliveryapp.backend.user.mapper.UserMapper;
 import com.deliveryapp.backend.user.model.User;
 import com.deliveryapp.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +19,8 @@ import java.util.Optional;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    // private final AuthFacadeService authFacadeService;
+    //private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserResponseDTO> findAll() {
@@ -44,6 +46,18 @@ public class UserService implements IUserService {
     @Override
     public UserResponseDTO save(UserRequestDTO dto) {
         User savedUser = userRepository.save(userMapper.toEntity(dto));
+        return userMapper.toResponse(savedUser);
+    }
+
+    public UserResponseDTO saveMyUserProfile(Long id, UserUpdateRequestDTO dto) {
+
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        existingUser.setName(dto.getName());
+        existingUser.setLastName(dto.getLastName());
+        existingUser.setPassword(dto.getPassword());
+
+
+        User savedUser = userRepository.save(existingUser);
         return userMapper.toResponse(savedUser);
     }
 
