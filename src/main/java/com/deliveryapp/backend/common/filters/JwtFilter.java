@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +23,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -37,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
 
-            System.out.println("Error No token found!");
+            log.error("No token found. URI {}", request.getRequestURI());
 
             //le decimos que siga con el siguiente filtro pero no va a poder porque el siguiente filtro es el de validar el nombre
             // de usuario y contraseña pero como no lo obtuvimos aca y no hay otro metodo de validacion al final fallara la autenticacion
@@ -52,7 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
             boolean canBeTokenRenewed = jwtService.canBeTokenRenewed(token);
 
             if (isTokenExpired && !canBeTokenRenewed) {
-                System.out.println("Token expired!");
+                log.error("Token expired!");
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -67,7 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             //si el token no es valido o ya existe alguien autenticado entonces falla
             if (!isValidToken || SecurityContextHolder.getContext().getAuthentication() != null) {
-                System.out.println("Invalid token or user already authenticated");
+                log.error("Invalid token or user already authenticated");
                 filterChain.doFilter(request, response);
                 return;
             }

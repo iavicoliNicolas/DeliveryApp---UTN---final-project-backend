@@ -9,61 +9,64 @@ import com.deliveryapp.backend.product.filter.ProductFilter;
 import com.deliveryapp.backend.product.service.IProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-
-
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
+@Slf4j
 public class ProductController {
     private final IProductService productService;
 
-
     @GetMapping
     public ResponseEntity<PaginationResult<ProductResponseDTO>> findAllProducts(
-
             @ModelAttribute PaginationQuery paginationQuery,
             @ModelAttribute ProductFilter productFilter
     ) {
-
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(productService.findAll(paginationQuery, productFilter));
+        log.info("Getting all products");
+        PaginationResult<ProductResponseDTO> paginationResult = productService.findAll(paginationQuery, productFilter);
+        log.info("Found {} products", paginationResult.getTotalElements());
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(paginationResult);
     }
 
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> findProductById(@PathVariable Long id) {
+        log.info("Getting product with id {}", id);
         ProductResponseDTO productResponseDTO = productService.findById(id).orElseThrow(
                 () -> new ProductNotFoundException(id)
         );
+        log.info("Found product with id {},", id);
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(productResponseDTO);
     }
 
-    //Como Comerciante quiero realizar Alta de productos de mi comercio
     @PostMapping
     public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO productRequestDTO) {
-        return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(productService.save(productRequestDTO));
-
+        log.info("Creating new product");
+        ProductResponseDTO productResponseDTO = productService.save(productRequestDTO);
+        log.info("Created new product with id {}", productResponseDTO.getId());
+        return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(productResponseDTO);
     }
 
-
-    //Como Comerciante quiero realizar Modificacion de productos de mi comercio
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> updateProduct(@Valid @PathVariable Long id, @RequestBody ProductRequestDTO productRequestDTO) {
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(productService.update(id, productRequestDTO));
+        log.info("Updating product with id {}", id);
+        ProductResponseDTO productResponseDTO = productService.update(id, productRequestDTO);
+        log.info("Updated product with id {}", id);
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(productResponseDTO);
     }
 
 
-    //Como Comerciante quiero realizar Baja de productos de mi comercio
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        log.info("Deleting product with id {}", id);
         productService.deleteById(id);
+        log.info("Deleted product with id {}", id);
         return ResponseEntity.noContent().build();
     }
-
 
 }
 
