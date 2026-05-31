@@ -6,7 +6,6 @@ import com.deliveryapp.backend.user.dto.*;
 import com.deliveryapp.backend.user.enums.ERole;
 import com.deliveryapp.backend.user.exception.UserEmailAlreadyRegisteredException;
 import com.deliveryapp.backend.user.exception.UserNotAuthorizedException;
-import com.deliveryapp.backend.user.mapper.UserMapper;
 import com.deliveryapp.backend.user.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
