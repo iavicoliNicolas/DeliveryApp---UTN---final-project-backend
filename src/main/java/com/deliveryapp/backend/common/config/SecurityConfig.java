@@ -49,10 +49,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/stores/**").hasRole("MERCHANT")
 
                         .requestMatchers(HttpMethod.GET, "/api/v1/orders").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/orders/**").hasAnyRole("RIDER", "MERCHANT")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/orders/{id}/location").hasAnyRole("RIDER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/orders/unassigned").hasRole("RIDER")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
                         .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasRole("CONSUMER")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/orders/**").hasAnyRole("RIDER", "MERCHANT")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/orders/**").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/orders/**").hasAnyRole("ADMINISTRATOR")
 
