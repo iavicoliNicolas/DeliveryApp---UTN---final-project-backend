@@ -30,7 +30,7 @@ public class UserRequestDTO {
     private String email;
 
     @NotBlank(message = "La contraseña no puede estar vacía")
-    @Size(max = 20, message = "La contraseña no puede superar los 20 caracteres")
+    @Size(max = 20, min = 6, message = "La contraseña Debe estar entre 6 y 20 caracteres")
     private String password;
 
     @NotNull(message = "El rol no puede ser nulo")
