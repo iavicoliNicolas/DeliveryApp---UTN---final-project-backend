@@ -286,7 +286,7 @@ public class OrderService implements IOrderService {
                 || (currentStatus == EOrderStatus.DISPATCHED && newStatus == EOrderStatus.COMPLETED)) {
 
             order.setStatus(newStatus);
-
+            order.setRider(authFacadeService.getCurrentUser());
             Order updatedOrder = orderRepository.save(order);
 
             return OrderMapper.toResponse(updatedOrder);
