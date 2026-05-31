@@ -1,11 +1,13 @@
 package com.deliveryapp.backend.common.exceptions;
 
+import com.deliveryapp.backend.order.exception.InvalidOrderStatusException;
 import com.deliveryapp.backend.order.exception.OrderNotFoundException;
 import com.deliveryapp.backend.product.exception.InvalidParameterSortByException;
 import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.exception.ProductSearchMissingLocationException;
 import com.deliveryapp.backend.store.exception.StoreNotFoundException;
 import com.deliveryapp.backend.user.exception.UserEmailAlreadyRegisteredException;
+import com.deliveryapp.backend.user.exception.UserNotAuthorizedException;
 import com.deliveryapp.backend.user.exception.UserNotFoundException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +41,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            ProductSearchMissingLocationException.class, InvalidParameterSortByException.class, UserEmailAlreadyRegisteredException.class
+            ProductSearchMissingLocationException.class, InvalidParameterSortByException.class, UserEmailAlreadyRegisteredException.class,
+            InvalidOrderStatusException.class
     })
     public ResponseEntity<ErrorMessage> handleBadRequestExceptions(HttpServletRequest request, Exception ex) {
         log.error("{} {} {}", ex.getMessage(), ex.getClass().getSimpleName(), request.getRequestURI());
@@ -59,7 +62,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            JwtException.class, AuthenticationException.class
+            JwtException.class, AuthenticationException.class, UserNotAuthorizedException.class
     })
     public ResponseEntity<ErrorMessage> forbidden(HttpServletRequest request, Exception ex) {
         log.error("{} {} {}", ex.getMessage(), ex.getClass().getSimpleName(), request.getRequestURI());
