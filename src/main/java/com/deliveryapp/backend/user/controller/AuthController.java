@@ -5,6 +5,7 @@ import com.deliveryapp.backend.common.services.JwtService;
 import com.deliveryapp.backend.user.dto.*;
 import com.deliveryapp.backend.user.enums.ERole;
 import com.deliveryapp.backend.user.exception.UserEmailAlreadyRegisteredException;
+import com.deliveryapp.backend.user.exception.UserNotAuthorizedException;
 import com.deliveryapp.backend.user.mapper.UserMapper;
 import com.deliveryapp.backend.user.service.IUserService;
 import jakarta.validation.Valid;
@@ -33,6 +34,11 @@ public class AuthController {
     public ResponseEntity<TokenResponseDTO> register(
             @Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
         log.info("Registering new user with role {}", registerRequestDTO.getRole());
+
+        if (registerRequestDTO.getRole().equals(ERole.ROLE_ADMINISTRATOR)) {
+            throw new UserNotAuthorizedException("No puede registrar un administrador");
+        }
+
         if (userService.existsUserByEmail(registerRequestDTO.getEmail())) {
             throw new UserEmailAlreadyRegisteredException("El email " + registerRequestDTO.getEmail() + " ya esta utilizado");
         }
