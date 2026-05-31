@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AuthController {
     private final IUserService userService;
-    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthFacadeService authFacadeService;
@@ -35,12 +34,15 @@ public class AuthController {
             @Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
         log.info("Registering new user with role {}", registerRequestDTO.getRole());
 
-        if (registerRequestDTO.getRole().equals(ERole.ROLE_ADMINISTRATOR)) {
-            throw new UserNotAuthorizedException("No puede registrar un administrador");
+        if (!registerRequestDTO.getRole().equals(ERole.ROLE_RIDER)
+           && !registerRequestDTO.getRole().equals(ERole.ROLE_CONSUMER)
+           && !registerRequestDTO.getRole().equals(ERole.ROLE_MERCHANT)) {
+
+            throw new UserNotAuthorizedException("Debe ingresar un rol válido");
         }
 
         if (userService.existsUserByEmail(registerRequestDTO.getEmail())) {
-            throw new UserEmailAlreadyRegisteredException("El email " + registerRequestDTO.getEmail() + " ya esta utilizado");
+            throw new UserEmailAlreadyRegisteredException("El email " + registerRequestDTO.getEmail() + " ya está utilizado");
         }
 
         UserRequestDTO userRequestDTO = new UserRequestDTO();
