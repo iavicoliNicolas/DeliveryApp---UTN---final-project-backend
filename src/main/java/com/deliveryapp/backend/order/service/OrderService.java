@@ -243,18 +243,22 @@ public class OrderService implements IOrderService {
             throw new StoreNotFoundException(currentUser.getId());
         }
 
-        if (order.getStatus() != EOrderStatus.PENDING) {
+        EOrderStatus currentStatus = order.getStatus();
+        EOrderStatus newStatus = dto.getStatus();
 
+        if ((currentStatus == EOrderStatus.PENDING && (newStatus == EOrderStatus.CONFIRMED || newStatus == EOrderStatus.CANCELLED))
+        || (currentStatus == EOrderStatus.CONFIRMED_ASSIGNED && newStatus == EOrderStatus.DISPATCHED)) {
+
+            order.setStatus(newStatus);
+
+            Order updatedOrder = orderRepository.save(order);
+
+            return OrderMapper.toResponse(updatedOrder);
+        } else {
             throw new RuntimeException(
-                    "Solo se pueden modificar pedidos pendientes"
+                    "Operación inválida"
             );
         }
-
-        order.setStatus(dto.getStatus());
-
-        Order updatedOrder = orderRepository.save(order);
-
-        return OrderMapper.toResponse(updatedOrder);
     }
 
     @Override
