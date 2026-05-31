@@ -9,7 +9,6 @@ import com.deliveryapp.backend.order.dto.UpdateOrderLocationRequestDTO;
 import com.deliveryapp.backend.order.dto.UpdateOrderStatusRequestDTO;
 import com.deliveryapp.backend.order.exception.OrderNotFoundException;
 import com.deliveryapp.backend.order.filter.OrderFilter;
-import com.deliveryapp.backend.order.model.Order;
 import com.deliveryapp.backend.order.service.IOrderService;
 import com.deliveryapp.backend.user.enums.ERole;
 import jakarta.validation.Valid;
