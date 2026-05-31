@@ -8,6 +8,7 @@ import com.deliveryapp.backend.order.dto.OrderResponseDTO;
 import com.deliveryapp.backend.order.dto.UpdateOrderLocationRequestDTO;
 import com.deliveryapp.backend.order.dto.UpdateOrderStatusRequestDTO;
 import com.deliveryapp.backend.order.enums.EOrderStatus;
+import com.deliveryapp.backend.order.exception.InvalidOrderStatusException;
 import com.deliveryapp.backend.order.exception.OrderNotFoundException;
 import com.deliveryapp.backend.order.filter.OrderFilter;
 import com.deliveryapp.backend.order.mapper.OrderMapper;
@@ -21,6 +22,8 @@ import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.model.Product;
 import com.deliveryapp.backend.product.repository.ProductRepository;
 import com.deliveryapp.backend.store.model.Store;
+import com.deliveryapp.backend.user.enums.ERole;
+import com.deliveryapp.backend.user.exception.UserNotAuthorizedException;
 import com.deliveryapp.backend.user.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -243,18 +246,56 @@ public class OrderService implements IOrderService {
             throw new StoreNotFoundException(currentUser.getId());
         }
 
-        if (order.getStatus() != EOrderStatus.PENDING) {
+        EOrderStatus currentStatus = order.getStatus();
+        EOrderStatus newStatus = dto.getStatus();
 
-            throw new RuntimeException(
-                    "Solo se pueden modificar pedidos pendientes"
+        if ((currentStatus == EOrderStatus.PENDING && (newStatus == EOrderStatus.CONFIRMED || newStatus == EOrderStatus.CANCELLED))
+        || (currentStatus == EOrderStatus.CONFIRMED_ASSIGNED && newStatus == EOrderStatus.DISPATCHED)) {
+
+            order.setStatus(newStatus);
+
+            Order updatedOrder = orderRepository.save(order);
+
+            return OrderMapper.toResponse(updatedOrder);
+        } else {
+            throw new InvalidOrderStatusException(
+                    "Operación inválida"
+            );
+        }
+    }
+
+    @Override
+    public OrderResponseDTO updateRiderOrderStatus(
+            Long id,
+            UpdateOrderStatusRequestDTO dto) {
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() ->
+                        new OrderNotFoundException(id)
+                );
+
+        User currentUser = authFacadeService.getCurrentUser();
+        if (!currentUser.getRole().equals(ERole.ROLE_RIDER)) {
+            throw new UserNotAuthorizedException("Operación prohibida");
+        }
+
+        EOrderStatus currentStatus = order.getStatus();
+        EOrderStatus newStatus = dto.getStatus();
+
+        if ((currentStatus == EOrderStatus.CONFIRMED && newStatus == EOrderStatus.CONFIRMED_ASSIGNED)
+                || (currentStatus == EOrderStatus.DISPATCHED && newStatus == EOrderStatus.COMPLETED)) {
+
+            order.setStatus(newStatus);
+            order.setRider(authFacadeService.getCurrentUser());
+            Order updatedOrder = orderRepository.save(order);
+
+            return OrderMapper.toResponse(updatedOrder);
+        } else {
+            throw new InvalidOrderStatusException(
+                    "Operación inválida"
             );
         }
 
-        order.setStatus(dto.getStatus());
-
-        Order updatedOrder = orderRepository.save(order);
-
-        return OrderMapper.toResponse(updatedOrder);
     }
 
     @Override

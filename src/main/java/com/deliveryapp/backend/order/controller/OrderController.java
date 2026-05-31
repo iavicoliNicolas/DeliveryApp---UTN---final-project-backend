@@ -2,6 +2,7 @@ package com.deliveryapp.backend.order.controller;
 
 import com.deliveryapp.backend.common.pagination.PaginationQuery;
 import com.deliveryapp.backend.common.pagination.PaginationResult;
+import com.deliveryapp.backend.common.services.AuthFacadeService;
 import com.deliveryapp.backend.order.dto.CreateOrderRequestDTO;
 import com.deliveryapp.backend.order.dto.OrderResponseDTO;
 import com.deliveryapp.backend.order.dto.UpdateOrderLocationRequestDTO;
@@ -9,6 +10,7 @@ import com.deliveryapp.backend.order.dto.UpdateOrderStatusRequestDTO;
 import com.deliveryapp.backend.order.exception.OrderNotFoundException;
 import com.deliveryapp.backend.order.filter.OrderFilter;
 import com.deliveryapp.backend.order.service.IOrderService;
+import com.deliveryapp.backend.user.enums.ERole;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import java.util.List;
 @Slf4j
 public class OrderController {
     private final IOrderService orderService;
+    private final AuthFacadeService authFacadeService;
 
     @GetMapping
     public ResponseEntity<List<OrderResponseDTO>> findAllOrders() {
@@ -60,12 +63,23 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<OrderResponseDTO> updateMerchantOrderStatus(
+    public ResponseEntity<OrderResponseDTO> updateOrderStatus(
             @PathVariable Long id,
             @Valid @RequestBody UpdateOrderStatusRequestDTO dto
     ) {
+        OrderResponseDTO orderResponseDTO = new OrderResponseDTO();
+
         log.info("Updating order id {} with status {}", id, dto.getStatus());
-        OrderResponseDTO orderResponseDTO = orderService.updateMerchantOrderStatus(id, dto);
+
+        if (authFacadeService.getCurrentUser().getRole().equals(ERole.ROLE_MERCHANT)) {
+            log.info("User Role is MERCHANT");
+            orderResponseDTO = orderService.updateMerchantOrderStatus(id, dto);
+
+        } else if (authFacadeService.getCurrentUser().getRole().equals(ERole.ROLE_RIDER)) {
+            log.info("User Role is RIDER");
+            orderResponseDTO = orderService.updateRiderOrderStatus(id, dto);
+
+        }
         log.info("Updated order id {} with status {}", orderResponseDTO.getId(), orderResponseDTO.getStatus());
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderResponseDTO);
     }

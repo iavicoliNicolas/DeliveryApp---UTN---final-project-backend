@@ -19,6 +19,7 @@ public interface IOrderService {
     Optional<OrderResponseDTO> findById(Long id);
     OrderResponseDTO update (Long id, CreateOrderRequestDTO createOrderRequestDTO);
     OrderResponseDTO updateMerchantOrderStatus(Long id, @Valid UpdateOrderStatusRequestDTO dto);
+    OrderResponseDTO updateRiderOrderStatus(Long id, @Valid UpdateOrderStatusRequestDTO dto);
     OrderResponseDTO updateOrderLocation(Long id, @Valid UpdateOrderLocationRequestDTO dto);
     void deleteById(Long id);
     List<OrderResponseDTO> findUnassignedOrders();
