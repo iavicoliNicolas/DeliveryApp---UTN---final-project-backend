@@ -9,6 +9,7 @@ import com.deliveryapp.backend.user.exception.UserNotFoundException;
 import com.deliveryapp.backend.user.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
     private final IUserService userService;
     private final PasswordEncoder passwordEncoder;
@@ -27,69 +29,80 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> findAllUsers(
             @RequestParam(required = false) ERole role) {
+        log.info("Getting all users");
         if (role != null) {
             return ResponseEntity.ok(userService.findAllByRole(role));
         }
-        return ResponseEntity.ok(userService.findAll());
+        List<UserResponseDTO> userResponseDTOList = userService.findAll();
+        log.info("Found {}  users", userResponseDTOList.size());
+        return ResponseEntity.ok(userResponseDTOList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> findUserById(@PathVariable Long id) {
+        log.info("Getting user with id {}", id);
         UserResponseDTO userResponseDTO = userService.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+        log.info("Found user with id {}", id);
         return ResponseEntity.ok(userResponseDTO);
     }
 
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(
             @Valid @RequestBody UserRequestDTO userRequestDTO) {
-
+        log.info("Creating new user");
         userRequestDTO.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(userRequestDTO));
+        UserResponseDTO userResponseDTO = userService.save(userRequestDTO);
+        log.info("Created new user with id {}", userResponseDTO.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDTO);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(
             @Valid @PathVariable Long id,
             @RequestBody UserRequestDTO userRequestDTO) {
-
+        log.info("Updating user with id {}", id);
         userRequestDTO.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
-
-        return ResponseEntity.ok(userService.update(id, userRequestDTO));
+        UserResponseDTO userResponseDTO = userService.update(id, userRequestDTO);
+        log.info("Updated user with id {}", userResponseDTO.getId());
+        return ResponseEntity.ok(userResponseDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        log.info("Deleting user with id {}", id);
         userService.deleteById(id);
-        return ResponseEntity.ok("User with id " + id + " deleted");
+        log.info("Deleted user with id {}", id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> findMyProfile() {
         Long id = authFacadeService.getCurrentUser().getId();
+        log.info("Getting own user profile for user id {}", id);
         UserResponseDTO userResponseDTO = userService.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+        log.info("Found own user profile for user id {}", id);
         return ResponseEntity.ok(userResponseDTO);
     }
 
-
     @PatchMapping("/me")
     public ResponseEntity<UserResponseDTO> updateMyProfile(@RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
-
         Long id = authFacadeService.getCurrentUser().getId();
+        log.info("Updating own user profile for user id {}", id);
         userUpdateRequestDTO.setPassword(passwordEncoder.encode(userUpdateRequestDTO.getPassword()));
-
-        return ResponseEntity.ok(userService.saveMyUserProfile(id, userUpdateRequestDTO));
-
+        UserResponseDTO userResponseDTO = userService.saveMyUserProfile(id, userUpdateRequestDTO);
+        log.info("Updated own user profile for user id {}", id);
+        return ResponseEntity.ok(userResponseDTO);
     }
 
     @DeleteMapping("/me")
     public ResponseEntity<Void> deleteMyProfile() {
         Long id = authFacadeService.getCurrentUser().getId();
+        log.info("Deleting own user profile for user id {}", id);
         userService.deleteById(id);
+        log.info("Deleted own user profile for user id {}", id);
         return ResponseEntity.noContent().build();
     }
-
 
 }
