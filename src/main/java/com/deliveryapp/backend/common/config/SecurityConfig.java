@@ -48,6 +48,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/stores/**").hasRole("MERCHANT")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/stores/**").hasRole("MERCHANT")
 
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/my-orders").hasRole("CONSUMER")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/my-assigned-order").hasRole("RIDER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/orders").hasAnyRole("ADMINISTRATOR", "MERCHANT", "RIDER", "CONSUMER")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/orders/{id}/location").hasAnyRole("RIDER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/orders/unassigned").hasRole("RIDER")
@@ -66,12 +68,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasRole("ADMINISTRATOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasRole("ADMINISTRATOR")
 
-
                         .anyRequest().authenticated()
 
                 )
                 .headers(headers -> headers
-                        .frameOptions(frame -> frame.sameOrigin()) // Allow frames from same origin para que funcione h2-console
+                        .frameOptions(frame -> frame.sameOrigin())
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -83,7 +84,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 
@@ -98,6 +98,5 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
         return config.getAuthenticationManager();
     }
-
 
 }

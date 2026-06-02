@@ -36,6 +36,22 @@ public class OrderController {
         return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderResponseDTOList);
     }
 
+    @GetMapping("/my-orders")
+    public ResponseEntity<List<OrderResponseDTO>> findMyOrders() {
+        log.info("Getting orders for authenticated consumer");
+        List<OrderResponseDTO> orderResponseDTOList = orderService.findMyOrders();
+        log.info("Found {} orders for consumer", orderResponseDTOList.size());
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderResponseDTOList);
+    }
+
+    @GetMapping("/my-assigned-order")
+    public ResponseEntity<OrderResponseDTO> findMyAssignedOrder() {
+        log.info("Getting assigned order for authenticated rider");
+        OrderResponseDTO orderResponseDTO = orderService.findMyAssignedOrder();
+        log.info("Found assigned order with id {} for rider", orderResponseDTO.getId());
+        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderResponseDTO);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponseDTO> findOrderById(@PathVariable Long id) {
         log.info("Getting order with id {}", id);
