@@ -336,4 +336,14 @@ public class OrderService implements IOrderService {
                 .map(OrderMapper::toResponse)
                 .toList();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponseDTO> findMyOrders() {
+        Long consumerId = authFacadeService.getCurrentUser().getId();
+        return orderRepository.findByConsumerId(consumerId)
+                .stream()
+                .map(OrderMapper::toResponse)
+                .toList();
+    }
 }
