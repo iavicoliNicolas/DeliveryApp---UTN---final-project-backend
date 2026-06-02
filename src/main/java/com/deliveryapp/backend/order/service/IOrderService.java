@@ -17,10 +17,11 @@ public interface IOrderService {
     List<OrderResponseDTO> findAll();
     OrderResponseDTO save(CreateOrderRequestDTO dto);
     Optional<OrderResponseDTO> findById(Long id);
-    OrderResponseDTO update (Long id, CreateOrderRequestDTO createOrderRequestDTO);
+    OrderResponseDTO update(Long id, CreateOrderRequestDTO createOrderRequestDTO);
     OrderResponseDTO updateMerchantOrderStatus(Long id, @Valid UpdateOrderStatusRequestDTO dto);
     OrderResponseDTO updateRiderOrderStatus(Long id, @Valid UpdateOrderStatusRequestDTO dto);
     OrderResponseDTO updateOrderLocation(Long id, @Valid UpdateOrderLocationRequestDTO dto);
     void deleteById(Long id);
     List<OrderResponseDTO> findUnassignedOrders();
+    List<OrderResponseDTO> findMyOrders();
 }

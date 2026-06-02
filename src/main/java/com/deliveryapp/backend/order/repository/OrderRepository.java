@@ -13,5 +13,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     List<Order> findByStoreId(Long storeId);
 
     List<Order> findByRiderIsNullAndStatus(EOrderStatus status);
-}
 
+    List<Order> findByConsumerId(Long consumerId);
+}
