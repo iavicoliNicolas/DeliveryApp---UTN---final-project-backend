@@ -149,7 +149,7 @@ public class ProductService implements IProductService {
 
 
     private void isOwnerVerification(Store existingStore) {
-        if (!existingStore.getOwner().equals(authFacadeService.getCurrentUser())) {
+        if (!existingStore.getOwner().equals(authFacadeService.getCurrentUser()) && !authFacadeService.getCurrentUser().getRole().equals(ERole.ROLE_ADMINISTRATOR)) {
             throw new StoreNotFoundException(existingStore.getId());
         }
     }

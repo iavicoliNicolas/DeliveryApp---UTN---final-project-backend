@@ -180,7 +180,10 @@ public class OrderService implements IOrderService {
     @Override
     public Optional<OrderResponseDTO> findById(Long id) {
 
-        if (!authFacadeService.getCurrentUser().equals(orderRepository.findById(id).get().getRider())) {
+        if (!authFacadeService.getCurrentUser().equals(orderRepository.findById(id).get().getRider()) &&
+        !authFacadeService.getCurrentUser().equals(orderRepository.findById(id).get().getConsumer()) &&
+        !authFacadeService.getCurrentUser().equals(orderRepository.findById(id).get().getStore().getOwner()) &&
+        !authFacadeService.getCurrentUser().getRole().equals(ERole.ROLE_ADMINISTRATOR)) {
             throw new OrderNotFoundException(id);
         }
 

@@ -139,7 +139,7 @@ public class StoreService implements IStoreService{
                         () -> new StoreNotFoundException(id)
                 );
 
-        if(!existingStore.getOwner().equals(authFacadeService.getCurrentUser())){
+        if(!existingStore.getOwner().equals(authFacadeService.getCurrentUser()) && !authFacadeService.getCurrentUser().getRole().equals(ERole.ROLE_ADMINISTRATOR)){
             throw new StoreNotFoundException(id);
         }
 
