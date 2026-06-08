@@ -179,6 +179,11 @@ public class OrderService implements IOrderService {
 
     @Override
     public Optional<OrderResponseDTO> findById(Long id) {
+
+        if (!authFacadeService.getCurrentUser().equals(orderRepository.findById(id).get().getRider())) {
+            throw new OrderNotFoundException(id);
+        }
+
         return orderRepository.findById(id).map(OrderMapper::toResponse);
     }
 
