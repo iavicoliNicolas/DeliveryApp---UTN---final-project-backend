@@ -21,6 +21,16 @@ springdoc:
 
 app:
   custom:
-   api:
-     version: 1.0.0
+    api:
+      version: 1.0.0
+
+#jwt:
+#  secret: ID32WQ74uayoGI3nW7o9MEZKoaNzDongyYltCai2aY8kdWIqlrn4dmnbA3EFngsi
+#  expiration: 86400000
+#  refresh-window: 604800000
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
+  refresh-window: ${JWT_REFRESH_WINDOW}
 

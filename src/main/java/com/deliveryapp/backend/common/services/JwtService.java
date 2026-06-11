@@ -3,6 +3,7 @@ package com.deliveryapp.backend.common.services;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +15,18 @@ import java.util.Map;
 public class JwtService {
 
     //clave secreta de al menos 64 caracteres de largo
-    private static final String SECRET_KEY = "ID32WQ74uayoGI3nW7o9MEZKoaNzDongyYltCai2aY8kdWIqlrn4dmnbA3EFngsi";
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
+    //private static final String SECRET_KEY = "ID32WQ74uayoGI3nW7o9MEZKoaNzDongyYltCai2aY8kdWIqlrn4dmnbA3EFngsi";
 
     //tiempo de expiracion de nuestro token en milisegundos .. voy hacer que expire a las 24 hs
-    private static final long TOKEN_EXPIRATION = 1000 * 60 * 60 * 24;
+    @Value("${jwt.expiration}")
+    private static long TOKEN_EXPIRATION;
     //private static final long TOKEN_EXPIRATION = 1000;
 
     //un token va a poder ser renovado hasta 7 dias despues de haya caducado
-    private static final long REFRESH_TOKEN_WINDOW = 1000 * 60 * 60 * 24 * 7;
+    @Value("${jwt.refresh-window}")
+    private static long REFRESH_TOKEN_WINDOW;
 
     public String generateToken(UserDetails userDetails) {
         //puedo añadirle otra informacion que quiera al este mapa
