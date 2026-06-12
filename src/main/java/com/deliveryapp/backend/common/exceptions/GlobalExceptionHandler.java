@@ -6,6 +6,7 @@ import com.deliveryapp.backend.product.exception.InvalidParameterSortByException
 import com.deliveryapp.backend.product.exception.ProductNotFoundException;
 import com.deliveryapp.backend.product.exception.ProductSearchMissingLocationException;
 import com.deliveryapp.backend.store.exception.StoreNotFoundException;
+import com.deliveryapp.backend.store.exception.StoreSearchMissingLocationException;
 import com.deliveryapp.backend.user.exception.UserEmailAlreadyRegisteredException;
 import com.deliveryapp.backend.user.exception.UserNotAuthorizedException;
 import com.deliveryapp.backend.user.exception.UserNotFoundException;
@@ -42,7 +43,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             ProductSearchMissingLocationException.class, InvalidParameterSortByException.class, UserEmailAlreadyRegisteredException.class,
-            InvalidOrderStatusException.class
+            InvalidOrderStatusException.class, StoreSearchMissingLocationException.class
     })
     public ResponseEntity<ErrorMessage> handleBadRequestExceptions(HttpServletRequest request, Exception ex) {
         log.error("{} {} {}", ex.getMessage(), ex.getClass().getSimpleName(), request.getRequestURI());
