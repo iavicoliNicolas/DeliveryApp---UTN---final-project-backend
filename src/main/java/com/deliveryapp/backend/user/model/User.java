@@ -1,8 +1,13 @@
 package com.deliveryapp.backend.user.model;
 
+import com.deliveryapp.backend.order.model.Order;
+import com.deliveryapp.backend.store.model.Store;
 import com.deliveryapp.backend.user.enums.ERole;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -31,5 +36,20 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private ERole role;
+
+    @OneToMany(mappedBy = "rider",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
+    private List<Order> orderRiders = new ArrayList<>();
+
+    @OneToMany(mappedBy = "consumer",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
+    private List<Order> orderConsumers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "owner",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
+    private List<Store> stores = new ArrayList<>();
 
 }

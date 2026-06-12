@@ -44,7 +44,7 @@ public class Product {
     @ManyToMany(
             mappedBy = "products",
             cascade = CascadeType.ALL)
-    private List<Order> accounts =
+    private List<Order> orders =
             new ArrayList<>();
 
 
