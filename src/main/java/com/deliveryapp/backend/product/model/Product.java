@@ -1,11 +1,14 @@
 package com.deliveryapp.backend.product.model;
 
+import com.deliveryapp.backend.order.model.Order;
 import com.deliveryapp.backend.product.enums.EProductStatus;
 import com.deliveryapp.backend.store.model.Store;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -37,6 +40,12 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")
     private Store store;
+
+    @ManyToMany(
+            mappedBy = "products",
+            cascade = CascadeType.ALL)
+    private List<Order> accounts =
+            new ArrayList<>();
 
 
 }
