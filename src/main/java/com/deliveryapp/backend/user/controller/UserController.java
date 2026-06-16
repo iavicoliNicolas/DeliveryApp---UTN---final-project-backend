@@ -6,7 +6,6 @@ import com.deliveryapp.backend.common.services.AuthFacadeService;
 import com.deliveryapp.backend.user.dto.UserRequestDTO;
 import com.deliveryapp.backend.user.dto.UserResponseDTO;
 import com.deliveryapp.backend.user.dto.UserUpdateRequestDTO;
-import com.deliveryapp.backend.user.enums.ERole;
 import com.deliveryapp.backend.user.exception.UserNotFoundException;
 import com.deliveryapp.backend.user.filter.UserFilter;
 import com.deliveryapp.backend.user.service.IUserService;
@@ -17,8 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
