@@ -8,6 +8,7 @@ import com.deliveryapp.backend.order.dto.OrderResponseDTO;
 import com.deliveryapp.backend.order.dto.UpdateOrderLocationRequestDTO;
 import com.deliveryapp.backend.order.dto.UpdateOrderStatusRequestDTO;
 import com.deliveryapp.backend.order.exception.OrderNotFoundException;
+import com.deliveryapp.backend.order.filter.AdminOrderFilter;
 import com.deliveryapp.backend.order.filter.OrderFilter;
 import com.deliveryapp.backend.order.service.IOrderService;
 import com.deliveryapp.backend.user.enums.ERole;
@@ -25,49 +26,126 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class OrderController {
+
     private final IOrderService orderService;
     private final AuthFacadeService authFacadeService;
 
     @GetMapping
-    public ResponseEntity<List<OrderResponseDTO>> findAllOrders() {
-        log.info("Getting all orders");
-        List<OrderResponseDTO> orderResponseDTOList = orderService.findAll();
-        log.info("Found {} orders", orderResponseDTOList.size());
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderResponseDTOList);
+    public ResponseEntity<PaginationResult<OrderResponseDTO>> findAllOrders(
+            @ModelAttribute PaginationQuery paginationQuery,
+            @ModelAttribute AdminOrderFilter orderFilter
+    ) {
+
+        log.info("Getting all orders with filters {}", orderFilter);
+
+        PaginationResult<OrderResponseDTO> paginationResult =
+                orderService.findAll(paginationQuery, orderFilter);
+
+        log.info("Found {} orders",
+                paginationResult.getTotalElements());
+
+        return ResponseEntity.ok(paginationResult);
     }
 
     @GetMapping("/my-orders")
     public ResponseEntity<List<OrderResponseDTO>> findMyOrders() {
+
         log.info("Getting orders for authenticated consumer");
-        List<OrderResponseDTO> orderResponseDTOList = orderService.findMyOrders();
-        log.info("Found {} orders for consumer", orderResponseDTOList.size());
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderResponseDTOList);
+
+        List<OrderResponseDTO> orderResponseDTOList =
+                orderService.findMyOrders();
+
+        log.info("Found {} orders for authenticated consumer",
+                orderResponseDTOList.size());
+
+        return ResponseEntity.ok(orderResponseDTOList);
+    }
+
+    @GetMapping("/unassigned")
+    public ResponseEntity<List<OrderResponseDTO>> findUnassignedOrders() {
+
+        log.info("Getting unassigned orders");
+
+        List<OrderResponseDTO> orderResponseDTOList =
+                orderService.findUnassignedOrders();
+
+        log.info("Found {} unassigned orders",
+                orderResponseDTOList.size());
+
+        return ResponseEntity.ok(orderResponseDTOList);
+    }
+
+    @GetMapping("/store/{storeId}")
+    public ResponseEntity<PaginationResult<OrderResponseDTO>> findOrdersByStore(
+            @PathVariable Long storeId,
+            @ModelAttribute PaginationQuery paginationQuery,
+            @ModelAttribute OrderFilter orderFilter
+    ) {
+
+        log.info("Getting orders for store {}", storeId);
+
+        PaginationResult<OrderResponseDTO> paginationResult =
+                orderService.findByStoreId(
+                        storeId,
+                        paginationQuery,
+                        orderFilter
+                );
+
+        log.info("Found {} orders for store {}",
+                paginationResult.getTotalElements(),
+                storeId);
+
+        return ResponseEntity.ok(paginationResult);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderResponseDTO> findOrderById(@PathVariable Long id) {
+    public ResponseEntity<OrderResponseDTO> findOrderById(
+            @PathVariable Long id
+    ) {
+
         log.info("Getting order with id {}", id);
-        OrderResponseDTO orderResponseDTO = orderService.findById(id).orElseThrow(
-                () -> new OrderNotFoundException(id)
-        );
+
+        OrderResponseDTO orderResponseDTO =
+                orderService.findById(id)
+                        .orElseThrow(() -> new OrderNotFoundException(id));
+
         log.info("Found order with id {}", id);
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderResponseDTO);
+
+        return ResponseEntity.ok(orderResponseDTO);
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponseDTO> createOrder(@Valid @RequestBody CreateOrderRequestDTO orderRequestDTO) {
+    public ResponseEntity<OrderResponseDTO> createOrder(
+            @Valid @RequestBody CreateOrderRequestDTO orderRequestDTO
+    ) {
+
         log.info("Creating new order");
-        OrderResponseDTO orderResponseDTO = orderService.save(orderRequestDTO);
-        log.info("Created new order with id {}", orderResponseDTO.getId());
-        return ResponseEntity.status(HttpStatusCode.valueOf(201)).body(orderResponseDTO);
+
+        OrderResponseDTO orderResponseDTO =
+                orderService.save(orderRequestDTO);
+
+        log.info("Created order with id {}",
+                orderResponseDTO.getId());
+
+        return ResponseEntity.status(HttpStatusCode.valueOf(201))
+                .body(orderResponseDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrderResponseDTO> updateOrder(@Valid @PathVariable Long id, @RequestBody CreateOrderRequestDTO createOrderRequestDTO) {
+    public ResponseEntity<OrderResponseDTO> updateOrder(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateOrderRequestDTO createOrderRequestDTO
+    ) {
+
         log.info("Updating order with id {}", id);
-        OrderResponseDTO orderResponseDTO = orderService.update(id, createOrderRequestDTO);
-        log.info("Updated order with id {}", orderResponseDTO.getId());
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderResponseDTO);
+
+        OrderResponseDTO orderResponseDTO =
+                orderService.update(id, createOrderRequestDTO);
+
+        log.info("Updated order with id {}",
+                orderResponseDTO.getId());
+
+        return ResponseEntity.ok(orderResponseDTO);
     }
 
     @PatchMapping("/{id}/status")
@@ -75,21 +153,44 @@ public class OrderController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateOrderStatusRequestDTO dto
     ) {
-        OrderResponseDTO orderResponseDTO = new OrderResponseDTO();
 
-        log.info("Updating order id {} with status {}", id, dto.getStatus());
+        log.info("Updating order {} status to {}",
+                id,
+                dto.getStatus());
 
-        if (authFacadeService.getCurrentUser().getRole().equals(ERole.ROLE_MERCHANT)) {
-            log.info("User Role is MERCHANT");
-            orderResponseDTO = orderService.updateMerchantOrderStatus(id, dto);
+        OrderResponseDTO orderResponseDTO;
 
-        } else if (authFacadeService.getCurrentUser().getRole().equals(ERole.ROLE_RIDER)) {
-            log.info("User Role is RIDER");
-            orderResponseDTO = orderService.updateRiderOrderStatus(id, dto);
+        if (authFacadeService.isRole(ERole.ROLE_MERCHANT)) {
 
+            log.info("Authenticated user is MERCHANT");
+
+            orderResponseDTO =
+                    orderService.updateMerchantOrderStatus(id, dto);
+
+        } else if (authFacadeService.isRole(ERole.ROLE_RIDER)) {
+
+            log.info("Authenticated user is RIDER");
+
+            orderResponseDTO =
+                    orderService.updateRiderOrderStatus(id, dto);
+
+        } else {
+
+            log.warn(
+                    "User with role {} attempted to update order status",
+                    authFacadeService.getCurrentUser().getRole()
+            );
+
+            throw new RuntimeException(
+                    "No tiene permisos para modificar estados de pedidos"
+            );
         }
-        log.info("Updated order id {} with status {}", orderResponseDTO.getId(), orderResponseDTO.getStatus());
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderResponseDTO);
+
+        log.info("Order {} updated to status {}",
+                orderResponseDTO.getId(),
+                orderResponseDTO.getStatus());
+
+        return ResponseEntity.ok(orderResponseDTO);
     }
 
     @PatchMapping("/{id}/location")
@@ -97,36 +198,29 @@ public class OrderController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateOrderLocationRequestDTO dto
     ) {
-        log.info("Updating order id {} with new location", id);
-        OrderResponseDTO orderResponseDTO = orderService.updateOrderLocation(id, dto);
-        log.info("Updated order id {} with new location", orderResponseDTO.getId());
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderResponseDTO);
+
+        log.info("Updating location for order {}", id);
+
+        OrderResponseDTO orderResponseDTO =
+                orderService.updateOrderLocation(id, dto);
+
+        log.info("Location updated for order {}",
+                orderResponseDTO.getId());
+
+        return ResponseEntity.ok(orderResponseDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
-        log.info("Deleting order id {}", id);
+    public ResponseEntity<Void> deleteOrder(
+            @PathVariable Long id
+    ) {
+
+        log.info("Deleting order {}", id);
+
         orderService.deleteById(id);
-        log.info("Deleted order id {}", id);
+
+        log.info("Deleted order {}", id);
+
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("/store/{storeId}")
-    public ResponseEntity<PaginationResult<OrderResponseDTO>> findOrdersByStore(@PathVariable Long storeId,
-                                                                                @ModelAttribute PaginationQuery paginationQuery,
-                                                                                @ModelAttribute OrderFilter orderFilter) {
-        log.info("Getting orders for store {}", storeId);
-        PaginationResult<OrderResponseDTO> paginationResult = orderService.findByStoreId(storeId, paginationQuery, orderFilter);
-        log.info("Found {} orders for store {}", paginationResult.getTotalElements(), storeId);
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(paginationResult);
-    }
-
-    @GetMapping("/unassigned")
-    public ResponseEntity<List<OrderResponseDTO>> findUnassignedOrders() {
-        log.info("Getting orders unassigned");
-        List<OrderResponseDTO> orderResponseDTOList = orderService.findUnassignedOrders();
-        log.info("Found {} orders unassigned", orderResponseDTOList.size());
-        return ResponseEntity.status(HttpStatusCode.valueOf(200)).body(orderResponseDTOList);
-    }
-
 }
