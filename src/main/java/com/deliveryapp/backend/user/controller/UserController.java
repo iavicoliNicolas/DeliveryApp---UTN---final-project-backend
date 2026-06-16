@@ -1,11 +1,14 @@
 package com.deliveryapp.backend.user.controller;
 
+import com.deliveryapp.backend.common.pagination.PaginationQuery;
+import com.deliveryapp.backend.common.pagination.PaginationResult;
 import com.deliveryapp.backend.common.services.AuthFacadeService;
 import com.deliveryapp.backend.user.dto.UserRequestDTO;
 import com.deliveryapp.backend.user.dto.UserResponseDTO;
 import com.deliveryapp.backend.user.dto.UserUpdateRequestDTO;
 import com.deliveryapp.backend.user.enums.ERole;
 import com.deliveryapp.backend.user.exception.UserNotFoundException;
+import com.deliveryapp.backend.user.filter.UserFilter;
 import com.deliveryapp.backend.user.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,15 +30,19 @@ public class UserController {
     private final AuthFacadeService authFacadeService;
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> findAllUsers(
-            @RequestParam(required = false) ERole role) {
-        log.info("Getting all users");
-        if (role != null) {
-            return ResponseEntity.ok(userService.findAllByRole(role));
-        }
-        List<UserResponseDTO> userResponseDTOList = userService.findAll();
-        log.info("Found {}  users", userResponseDTOList.size());
-        return ResponseEntity.ok(userResponseDTOList);
+    public ResponseEntity<PaginationResult<UserResponseDTO>> findAllUsers(
+            @ModelAttribute PaginationQuery paginationQuery,
+            @ModelAttribute UserFilter userFilter
+    ) {
+
+        log.info("Getting users with filters");
+
+        PaginationResult<UserResponseDTO> paginationResult =
+                userService.findAll(paginationQuery, userFilter);
+
+        log.info("Found {} users", paginationResult.getTotalElements());
+
+        return ResponseEntity.ok(paginationResult);
     }
 
     @GetMapping("/{id}")
