@@ -8,8 +8,10 @@ import com.deliveryapp.backend.order.dto.OrderResponseDTO;
 import com.deliveryapp.backend.order.dto.UpdateOrderLocationRequestDTO;
 import com.deliveryapp.backend.order.dto.UpdateOrderStatusRequestDTO;
 import com.deliveryapp.backend.order.enums.EOrderStatus;
+import com.deliveryapp.backend.order.enums.EPaymentType;
 import com.deliveryapp.backend.order.exception.InvalidOrderStatusException;
 import com.deliveryapp.backend.order.exception.OrderNotFoundException;
+import com.deliveryapp.backend.order.filter.AdminOrderFilter;
 import com.deliveryapp.backend.order.filter.OrderFilter;
 import com.deliveryapp.backend.order.mapper.OrderMapper;
 import com.deliveryapp.backend.order.model.Order;
@@ -94,9 +96,16 @@ public class OrderService implements IOrderService {
         Specification<Order> specification = Specification.allOf(
                 OrderSpecification.byStoreId(storeId)
                         .and(
-                                OrderSpecification.byStatus(orderFilter.getStatus())
+                                OrderSpecification.byStatus(
+                                                orderFilter.getStatus() == null
+                                                        ? null
+                                                        : EOrderStatus.valueOf(orderFilter.getStatus())
+                                        )
                                         .and(
-                                                OrderSpecification.byPaymentType(orderFilter.getPaymentType())
+                                                OrderSpecification.byPaymentType(
+                                                                orderFilter.getPaymentType() == null
+                                                                        ? null
+                                                                        : EPaymentType.valueOf(orderFilter.getPaymentType()))
                                                         .and(
                                                                 OrderSpecification.byConsumerId(orderFilter.getConsumerId())
                                                                         .and(
@@ -124,13 +133,80 @@ public class OrderService implements IOrderService {
         );
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<OrderResponseDTO> findAll() {
+    public PaginationResult<OrderResponseDTO> findAll(
+            PaginationQuery paginationQuery,
+            AdminOrderFilter orderFilter
+    ) {
+        if (!authFacadeService.isRole(ERole.ROLE_ADMINISTRATOR)) {
+            throw new RuntimeException(
+                    "Solo los administradores pueden consultar todos los pedidos"
+            );
+        }
 
-        return orderRepository.findAll()
-                .stream()
-                .map(OrderMapper::toResponse)
-                .toList();
+        if (!(paginationQuery.getDirection().equalsIgnoreCase("asc")
+                || paginationQuery.getDirection().equalsIgnoreCase("desc"))) {
+
+            throw new InvalidParameterSortByException(
+                    "Parametro direction solo acepta valores: asc , desc"
+            );
+        }
+
+        if (!(paginationQuery.getSortBy().equalsIgnoreCase("id")
+                || paginationQuery.getSortBy().equalsIgnoreCase("total")
+                || paginationQuery.getSortBy().equalsIgnoreCase("status")
+                || paginationQuery.getSortBy().equalsIgnoreCase("paymentType")
+                || paginationQuery.getSortBy().equalsIgnoreCase("lastUpdate")
+                || paginationQuery.getSortBy().equalsIgnoreCase("customerAddress"))) {
+
+            throw new InvalidParameterSortByException(
+                    "Parametro sortBy solo acepta valores: id, total, status, paymentType, lastUpdate, customerAddress"
+            );
+        }
+        
+        PageRequest pageRequest = PageRequest.of(
+                paginationQuery.getPage(),
+                paginationQuery.getSize(),
+                Sort.by(
+                        Sort.Direction.fromString(
+                                paginationQuery.getDirection()
+                        ),
+                        paginationQuery.getSortBy()
+                )
+        );
+
+        Specification<Order> specification = Specification.allOf(
+                OrderSpecification.byId(orderFilter.getId())
+                        .and(OrderSpecification.byRiderId(orderFilter.getRiderId()))
+                        .and(OrderSpecification.byConsumerId(orderFilter.getConsumerId()))
+                        .and(OrderSpecification.byStoreId(orderFilter.getStoreId()))
+                        .and(OrderSpecification.byCustomerAddress(orderFilter.getCustomerAddress()))
+                        .and(OrderSpecification.byStatus(orderFilter.getStatus()))
+                        .and(OrderSpecification.byPaymentType(orderFilter.getPaymentType()))
+                        .and(OrderSpecification.byTotal(
+                                orderFilter.getTotalMin(),
+                                orderFilter.getTotalMax()
+                        ))
+                        .and(OrderSpecification.byLastUpdate(
+                                orderFilter.getLastUpdateFrom(),
+                                orderFilter.getLastUpdateTo()
+                        ))
+        );
+
+        Page<Order> page =
+                orderRepository.findAll(specification, pageRequest);
+
+        return new PaginationResult<>(
+                page.getContent()
+                        .stream()
+                        .map(OrderMapper::toResponse)
+                        .toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements()
+        );
     }
 
     @Override
@@ -138,20 +214,20 @@ public class OrderService implements IOrderService {
 
         List<Product> products = new ArrayList<>();
 
-        for(Long productId : dto.getProducts()){
+        for (Long productId : dto.getProducts()) {
             Optional<Product> optionalProduct = productRepository.findById(productId);
 
-            if(optionalProduct.isEmpty()){
+            if (optionalProduct.isEmpty()) {
                 throw new ProductNotFoundException(productId);
             }
 
-            if(optionalProduct.get().getStatus().equals(EProductStatus.UNAVAILABLE)){
+            if (optionalProduct.get().getStatus().equals(EProductStatus.UNAVAILABLE)) {
                 throw new ProductException("El producto " + optionalProduct.get().getName() + " no está disponible");
             }
             optionalProduct.ifPresent(products::add);
         }
 
-        if(dto.getProducts() == null || dto.getProducts().isEmpty()){
+        if (dto.getProducts() == null || dto.getProducts().isEmpty()) {
             throw new RuntimeException("Debe haber al menos un producto en el pedido");
         }
 
@@ -181,9 +257,9 @@ public class OrderService implements IOrderService {
     public Optional<OrderResponseDTO> findById(Long id) {
 
         if (!authFacadeService.getCurrentUser().equals(orderRepository.findById(id).get().getRider()) &&
-        !authFacadeService.getCurrentUser().equals(orderRepository.findById(id).get().getConsumer()) &&
-        !authFacadeService.getCurrentUser().equals(orderRepository.findById(id).get().getStore().getOwner()) &&
-        !authFacadeService.getCurrentUser().getRole().equals(ERole.ROLE_ADMINISTRATOR)) {
+                !authFacadeService.getCurrentUser().equals(orderRepository.findById(id).get().getConsumer()) &&
+                !authFacadeService.getCurrentUser().equals(orderRepository.findById(id).get().getStore().getOwner()) &&
+                !authFacadeService.getCurrentUser().getRole().equals(ERole.ROLE_ADMINISTRATOR)) {
             throw new OrderNotFoundException(id);
         }
 
@@ -258,7 +334,7 @@ public class OrderService implements IOrderService {
         EOrderStatus newStatus = dto.getStatus();
 
         if ((currentStatus == EOrderStatus.PENDING && (newStatus == EOrderStatus.CONFIRMED || newStatus == EOrderStatus.CANCELLED))
-        || (currentStatus == EOrderStatus.CONFIRMED_ASSIGNED && newStatus == EOrderStatus.DISPATCHED)) {
+                || (currentStatus == EOrderStatus.CONFIRMED_ASSIGNED && newStatus == EOrderStatus.DISPATCHED)) {
 
             order.setStatus(newStatus);
 
